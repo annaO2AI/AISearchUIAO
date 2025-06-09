@@ -7,6 +7,10 @@ const API_BASE_URL_AISEARCH =
   process.env.NEXT_PUBLIC_API_BASE_URL_AISEARCH ||
   "https://ai-search-recruitment-api-hcg0c3bahzexatab.centralus-01.azurewebsites.net/"
 
+const API_BASE_URL_AISEARCH_HR =
+  process.env.NEXT_PUBLIC_API_BASE_URL_AISEARCH_HR ||
+  "https://ai-search-hr-api-dfbahehtdkaxh7c2.centralus-01.azurewebsites.net"
+
 export const API_ROUTES = {
   audioFiles: `${API_BASE_URL}/audio-files`,
   models: `${API_BASE_URL}/models`,
@@ -21,4 +25,9 @@ export const API_ROUTES = {
   ask: `${API_BASE_URL_AISEARCH}/ask`,
   deleteConversation: (conversation_id: string) =>
     `${API_BASE_URL_AISEARCH}/conversations/${conversation_id}`,
+
+  //HR AI Search api
+   hrconversations: `${API_BASE_URL_AISEARCH_HR}/api/chatbot/conversations`,
+   hrask: `${API_BASE_URL_AISEARCH_HR}/api/chatbot/ask`,
+
 }
