@@ -22,9 +22,9 @@ const menuItems = [
     icon: AiIcon,
     subItems: [
       { label: "Talent Acquisition", href: "/", icon: ArroTabIcon },
-      { label: "Procurement search", href: "/", icon: ArroTabIcon },
-      { label: "Finance search", href: "/", icon: ArroTabIcon },
-      { label: "Legal search", href: "/", icon: ArroTabIcon },
+      { label: "Procurement Search", href: "/", icon: ArroTabIcon },
+      { label: "Finance Search", href: "/", icon: ArroTabIcon },
+      { label: "Legal Search", href: "/", icon: ArroTabIcon },
     ],
   },
   {
@@ -32,7 +32,7 @@ const menuItems = [
     label: "Human Resources",
     icon: HrIcon,
     subItems: [
-      { label: "HR Compensation and Benefits", href: "/talent-acquisition", icon: ArroTabIcon },
+      { label: "HR Compensation & Benefits", href: "/talent-acquisition", icon: ArroTabIcon },
       { label: "Finance Analysis", href: "/talent-acquisition", icon: ArroTabIcon },
       { label: "Legal Analysis", href: "/talent-acquisition", icon: ArroTabIcon },
     ],
