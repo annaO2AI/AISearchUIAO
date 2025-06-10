@@ -71,18 +71,18 @@ export default function TalentAcquisition({ onSend }: { onSend: () => void }) {
   }
 
   useEffect(() => {
-    if (chatContainerRef.current) {
-      setTimeout(() => {
-        chatContainerRef.current!.scrollTo({
-          top: chatContainerRef.current!.scrollHeight,
-          behavior: "smooth",
-        });
-      }, 0);
-    }
-    if (inputRef.current && !isLoading) {
-      inputRef.current.focus();
-    }
-  }, [messages]);
+  if (chatContainerRef.current) {
+    setTimeout(() => {
+      chatContainerRef.current!.scrollTo({
+        top: chatContainerRef.current!.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 0);
+  }
+  if (inputRef.current && !isLoading) {
+    inputRef.current.focus();
+  }
+}, [messages, isLoading]); // Added isLoading to dependencies
 
   const sendMessage = async () => {
     if (!query?.trim()) return;
