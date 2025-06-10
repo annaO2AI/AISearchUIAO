@@ -84,7 +84,7 @@ export default function Sidebar({
           <div className={`overflow-hidden transition-all duration-300 ${openMenu === 'humanResources' ? 'max-h-60' : 'max-h-0'
               }`}
           >
-            <a href="#" className="flex block px-4 py-4 hover:bg-gray-200 gap-3 bg-gray-100 min-w-[20px]">
+            <a  href="/talent-acquisition" className="flex block px-4 py-4 hover:bg-gray-200 gap-3 bg-gray-100 min-w-[20px]">
                {isExpanded ? <> <ArroTabIcon width={20} className="min-w-[20px]" /> Talent Acquisition </>: <ArroTabIcon width={20} className="min-w-[20px]" /> }
             </a>
             <a href="#" className="block px-4 py-4 hover:bg-gray-200 flex gap-3 bg-gray-100 min-w-[20px]">
