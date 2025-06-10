@@ -12,7 +12,7 @@ import Popupprofile from "../components/Popupprofile"
 
 export default function LayoutWrapper({ children }: { children: ReactNode }) {
   const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(true)
+  const [collapsed, setCollapsed] = useState(false)
   const [hovered, setHovered] = useState(false)
 
   const isAltLayout = pathname === "/chat-ui"

@@ -3,11 +3,12 @@ const API_BASE_URL =
   "https://aisummary-api-usc-geemebfqfmead8f4.centralus-01.azurewebsites.net"
 // "https://aisummary-api-fue6a9gxabdceng4.canadacentral-01.azurewebsites.net"
 
+//ai search
 const API_BASE_URL_AISEARCH =
   process.env.NEXT_PUBLIC_API_BASE_URL_AISEARCH ||
   "https://ai-search-recruitment-api-hcg0c3bahzexatab.centralus-01.azurewebsites.net/"
 
-
+//HR search 3.4
 const API_BASE_URL_AISEARCH_HR =
   process.env.NEXT_PUBLIC_API_BASE_URL_AISEARCH_HR ||
   "https://ai-search-hr-api-dfbahehtdkaxh7c2.centralus-01.azurewebsites.net/"
