@@ -29,7 +29,7 @@ const menuItems = [
   },
   {
     id: "humanResources",
-    label: "Human Resources",
+    label: "Employee Enablement",
     icon: HrIcon,
     subItems: [
       { label: "HR Compensation & Benefits", href: "/talent-acquisition", icon: ArroTabIcon },
