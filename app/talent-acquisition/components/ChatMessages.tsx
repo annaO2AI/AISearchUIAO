@@ -1,4 +1,3 @@
-// components/ChatMessages.tsx
 import { LoganimationsIcon, DOCIcon, PDFIcon, LogIcon } from "./icons";
 
 interface Message {
@@ -14,6 +13,17 @@ interface ChatMessagesProps {
 }
 
 export default function ChatMessages({ messages, initials }: ChatMessagesProps) {
+  // Function to format markdown content
+  const formatMessageContent = (content: string) => {
+    return content
+      // Convert ### 1. **Title** to ◉ <strong>1. Title</strong>
+      .replace(/###\s*(\d+\.\s*)\*\*([^\*]+)\*\*/g, "<strong>$1$2</strong>")
+      // Convert remaining **text** to <strong>text</strong>
+      .replace(/\*\*([^\*]+)\*\*/g, "<strong>$1</strong>")
+      // Convert newlines to <br /> for proper rendering
+      .replace(/\n/g, "<br />");
+  };
+
   return (
     <div id="chat-box" className="flex-1 overflow-y-auto px-0 py-2 space-y-2">
       {messages.map((msg, idx) => (
@@ -58,11 +68,12 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
                 <span>{msg.content.replace("📎 ", "")}</span>
               </div>
             ) : (
-              <div>
-                <pre className="font-sans whitespace-pre-wrap break-words m-0 leading-7">
-                  {msg.content}
-                </pre>
-              </div>
+              <div
+                className="font-sans whitespace-pre-wrap break-words m-0 leading-7"
+                dangerouslySetInnerHTML={{
+                  __html: formatMessageContent(msg.content),
+                }}
+              />
             )}
           </div>
         </div>

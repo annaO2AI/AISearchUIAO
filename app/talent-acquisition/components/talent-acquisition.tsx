@@ -60,15 +60,21 @@ export default function TalentAcquisition({ onSend }: { onSend: () => void }) {
     fetchConversationId();
   }, [setConversationId]);
 
-  function extractLastResponse(response: string): string {
-    if (response.match(/\d+\s[^0-9]+/)) {
-      const matches = response.match(/(\d+\s[^0-9]+)/g);
-      if (matches) {
-        return matches.map((item) => item.trim()).join("\n");
-      }
+function extractLastResponse(response: string): string {
+  // Replace ### titles with bullet point ◉ and remove ** from bold text
+  const formattedResponse = response
+    .replace(/###\s*(\d+\.\s*)\*\*([^\*]+)\*\*/g, "**$1$2**") // Convert ### 1. **Title** to ◉ **1. Title**
+    .replace(/\*\*([^\*]+)\*\*/g, "**$1**"); // Preserve bold formatting for rendering
+
+  // If the response has numbered items, extract and join them
+  if (formattedResponse.match(/\d+\s[^0-9]+/)) {
+    const matches = formattedResponse.match(/(\d+\s[^0-9]+)/g);
+    if (matches) {
+      return matches.map((item) => item.trim()).join("\n");
     }
-    return response;
   }
+  return formattedResponse;
+}
 
   useEffect(() => {
   if (chatContainerRef.current) {
