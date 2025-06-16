@@ -11,10 +11,10 @@ export function middleware(request: NextRequest) {
 
   if (!isPublicPath && !token) {
     const redirectTo = `${request.nextUrl.origin}/auth/callback`
-    // const loginUrl = `https://aisummary-api-usc-geemebfqfmead8f4.centralus-01.azurewebsites.net?redirect_uri=${encodeURIComponent(
-    //   redirectTo
-    // )}`
-    // return NextResponse.redirect(loginUrl)
+    const loginUrl = `https://ai-search-hr-api-dfbahehtdkaxh7c2.centralus-01.azurewebsites.net/api/auth/login?redirect=${encodeURIComponent(
+      redirectTo
+    )}`
+    return NextResponse.redirect(loginUrl)
   }
 
   return NextResponse.next()
