@@ -13,6 +13,11 @@ const API_BASE_URL_AISEARCH_HR =
   process.env.NEXT_PUBLIC_API_BASE_URL_AISEARCH_HR ||
   "https://ai-search-hr-api-dfbahehtdkaxh7c2.centralus-01.azurewebsites.net/"
 
+//AIOps 2.0
+const API_BASE_URL_AISEARCH_AIOPS =
+  process.env.NEXT_PUBLIC_API_BASE_URL_AISEARCH_HR ||
+  "https://ai-ops-123321-b8e0gnejhydcb7he.centralus-01.azurewebsites.net/"
+
 export const API_ROUTES = {
   audioFiles: `${API_BASE_URL}/audio-files`,
   models: `${API_BASE_URL}/models`,
@@ -28,10 +33,12 @@ export const API_ROUTES = {
   deleteConversation: (conversation_id: string) =>
     `${API_BASE_URL_AISEARCH}/conversations/${conversation_id}`,
 
-  //talent acquisition API
+  //HR API
    hrconversations: `${API_BASE_URL_AISEARCH_HR}/api/chatbot/conversations`,
    hrask: `${API_BASE_URL_AISEARCH_HR}/api/chatbot/ask`,
      hrdeleteConversation: (conversation_id: string) =>
     `${API_BASE_URL_AISEARCH_HR}/api/chatbot/conversations/${conversation_id}`,
 
+   //AIOPs
+   aiopsask: `${API_BASE_URL_AISEARCH_AIOPS}/ask`,
 }
