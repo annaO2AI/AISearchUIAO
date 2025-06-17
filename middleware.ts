@@ -41,7 +41,7 @@ export function middleware(request: NextRequest) {
 
   if (!token) {
     const finalRedirect = "https://ai-search-hr-web-exevd6bfgdfdcvdj.centralus-01.azurewebsites.net/";
-    const callbackUrl = `${request.nextUrl.origin}/auth/callback?finalRedirect=${encodeURIComponent(finalRedirect)}`;
+    const callbackUrl = finalRedirect;
     const loginUrl = `https://ai-search-hr-api-dfbahehtdkaxh7c2.centralus-01.azurewebsites.net/api/auth/login?redirect=${encodeURIComponent(callbackUrl)}`;
     return NextResponse.redirect(loginUrl);
   }
