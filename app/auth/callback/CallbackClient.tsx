@@ -56,23 +56,28 @@
 // }
 
 "use client";
- 
+
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
- 
- 
+
 export default function AuthCallbackPage() {
   const router = useRouter();
- 
+
   useEffect(() => {
-    // Extract token from URL if needed
-    const urlParams = new URLSearchParams(window.location.search);
-    const returnTo = urlParams.get('returnTo') || '/';
-   
-    // Ensure the token is properly set (you might need to pass it from backend)
-    router.replace(returnTo);
-  }, [router]);
- 
+    // Ensure window is available (client-side only)
+    if (typeof window === "undefined") return;
+
+    const url = new URL(window.location.href);
+    const token = url.searchParams.get("token");
+
+    if (token) {
+      document.cookie = `access_token=${token}; path=/; secure; samesite=strict`;
+      router.replace("/"); // Use replace to avoid history entry
+    } else {
+      router.replace("/?error=missing_token"); // Consistent redirect path
+    }
+  }, [router]); // Added router to dependencies
+
   return (
     <div className="min-h-screen flex items-center justify-center">
       <p className="text-gray-600">Logging in...</p>
