@@ -10,7 +10,7 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     // Extract token from URL if needed
     const urlParams = new URLSearchParams(window.location.search);
-    const returnTo = urlParams.get('returnTo') || '/';
+    const returnTo = urlParams.get('returnTo') || 'https://ai-search-hr-web-exevd6bfgdfdcvdj.centralus-01.azurewebsites.net/';
    
     // Ensure the token is properly set (you might need to pass it from backend)
     router.replace(returnTo);
