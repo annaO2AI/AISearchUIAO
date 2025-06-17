@@ -16,6 +16,7 @@ import { decodeJWT } from "@/app/utils/decodeJWT";
 import FollowUpQuestions from "./FollowUpQuestions";
 import WelcomeMessage from "./WelcomeMessage"; // Import the new component
 import ChatMessages from "./ChatMessages";
+import PostmanData from "./PostmanData";
 
 export default function Aisearch({ onSend }: { onSend: () => void }) {
   const [fileName, setFileName] = useState("");
@@ -25,6 +26,7 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isInputFocused, setIsInputFocused] = useState(false);
+  const [postmanData, setPostmanData] = useState<any>(null);
 
   const {
     query,
@@ -202,6 +204,49 @@ useEffect(() => {
     }
   }, []);
 
+const handlePostmanIssue = async () => {
+    setIsLoading(true);
+    setMessages((prev) => [...prev, { 
+      sender: "user", 
+      content: "I am facing Postman's issue - api retrieving problem 30 minutes ago" 
+    }]);
+    setMessages((prev) => [...prev, { sender: "ai", content: "Thinking...", isLoading: true }]);
+
+    try {
+      const res = await fetchWithAuth(API_ROUTES.aiopsask, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [{
+            role: "user",
+            content: "I am facing Postman's issue - api retrieving problem 30 minutes ago"
+          }]
+        }),
+      });
+
+      const data = await res.json();
+      setPostmanData(data);
+      setMessages((prev) =>
+        prev.filter((msg) => !msg.isLoading).concat([
+          {
+            sender: "ai",
+            content: `Found ${data.documents.length} documents for Postman`,
+            followup_questions: [],
+          },
+        ])
+      );
+    } catch (err) {
+      console.error("Error during Postman issue query:", err);
+      setMessages((prev) =>
+        prev.filter((msg) => !msg.isLoading).concat([
+          { sender: "ai", content: "Something went wrong." },
+        ])
+      );
+    }
+
+    setIsLoading(false);
+  };
+
   function getInitials(name: string | null): string {
     if (!name) return "";
     const parts = name.split(" ");
@@ -218,7 +263,7 @@ useEffect(() => {
     .find((msg) => msg.sender === "ai" && !msg.isLoading);
 
   return (
-    <div id="chat-box-main" ref={chatContainerRef} className="flex flex-col minarea-max-hright">
+    <div id="chat-box-main" ref={chatContainerRef} className="flex flex-col minarea-max-hright-aiops">
       <div
         className={
           messages.length === 0
@@ -230,6 +275,7 @@ useEffect(() => {
           {messages.length === 0 && <WelcomeMessage username={username} />}
           <div className="flex flex-col h-full">
           <ChatMessages messages={messages} initials={initials} />
+          <PostmanData postmanData={postmanData} />
             {latestAIMessage && (
               <FollowUpQuestions
                 followupQuestions={latestAIMessage.followup_questions || []}
@@ -263,7 +309,7 @@ useEffect(() => {
                 <AIsearchIcon width={36} />
                 <input
                   type="text"
-                  placeholder="Type your messages here..."
+                  placeholder="I am facing Postman's issue - api retrieving problem 30 minutes ago"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && sendMessage()}
@@ -288,9 +334,18 @@ useEffect(() => {
                     />
                   </label>
                 </div>
-                <button
+                {/* <button
                   disabled={isLoading}
                   onClick={sendMessage}
+                  className={`bg-gradient-to-r from-indigo-500 to-blue-500 text-white p-6 py-2 rounded-full flex items-center gap-1 text-sm cursor-pointer ${
+                    isLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {isLoading ? "Processing..." : "Send"} <SendIcon width={20} />
+                </button> */}
+                <button
+                  disabled={isLoading}
+                  onClick={handlePostmanIssue}
                   className={`bg-gradient-to-r from-indigo-500 to-blue-500 text-white p-6 py-2 rounded-full flex items-center gap-1 text-sm cursor-pointer ${
                     isLoading ? "opacity-50 cursor-not-allowed" : ""
                   }`}

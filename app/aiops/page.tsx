@@ -30,7 +30,7 @@ export default function Aiops() {
 
   return (
     <DashboardProvider>
-      <div className="flex min-h-screen overflow-hidden">
+      <div className="flex overflow-hidden mt-12">
         {showSidebar && (
           <Sidebar
             collapsed={collapsed}

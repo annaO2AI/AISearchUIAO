@@ -86,6 +86,14 @@ body {
     scroll-behavior: smooth;
   }
 
+  .minarea-max-hright-aiops{
+        height: calc(100vh - 159px);
+    overflow-y: scroll;
+    overscroll-behavior: contain;
+    transition: all 0.9s ease-in-out;
+    scroll-behavior: smooth;
+  }
+
   #chat-box {
   flex: 1;
   overflow-y: visible; /* Or 'auto' if you want chat-box to scroll */

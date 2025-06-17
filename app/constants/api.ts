@@ -15,7 +15,7 @@ const API_BASE_URL_AISEARCH_HR =
 
 //AIOps 2.0
 const API_BASE_URL_AISEARCH_AIOPS =
-  process.env.NEXT_PUBLIC_API_BASE_URL_AISEARCH_HR ||
+  process.env.NEXT_PUBLIC_API_BASE_URL_AISEARCH_AIOPS ||
   "https://ai-ops-123321-b8e0gnejhydcb7he.centralus-01.azurewebsites.net/"
 
 export const API_ROUTES = {
