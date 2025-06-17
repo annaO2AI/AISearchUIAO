@@ -68,7 +68,7 @@ export default function AuthCallbackPage() {
     if (typeof window === "undefined") return;
 
     const token = searchParams.get("token");
-    const redirect = searchParams.get("redirect") || "https://ai-search-hr-web-exevd6bfgdfdcvdj.centralus-01.azurewebsites.net/";
+    const finalRedirect = searchParams.get("finalRedirect") || "https://ai-search-hr-web-exevd6bfgdfdcvdj.centralus-01.azurewebsites.net/";
     const error = searchParams.get("error");
 
     if (error) {
@@ -79,8 +79,9 @@ export default function AuthCallbackPage() {
 
     if (token) {
       document.cookie = `access_token=${token}; path=/; secure; samesite=strict`;
-      router.replace(decodeURIComponent(redirect));
+      router.replace(decodeURIComponent(finalRedirect));
     } else {
+      console.error("Missing token in callback");
       router.replace("/?error=missing_token");
     }
   }, [router, searchParams]);
