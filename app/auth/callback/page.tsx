@@ -1,12 +1,24 @@
-// "use client
-
-import { Suspense } from "react"
-import CallbackClient from "./CallbackClient"
-
-export default function CallbackPage() {
+"use client";
+ 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+ 
+ 
+export default function AuthCallbackPage() {
+  const router = useRouter();
+ 
+  useEffect(() => {
+    // Extract token from URL if needed
+    const urlParams = new URLSearchParams(window.location.search);
+    const returnTo = urlParams.get('returnTo') || '/';
+   
+    // Ensure the token is properly set (you might need to pass it from backend)
+    router.replace(returnTo);
+  }, [router]);
+ 
   return (
-    <Suspense fallback={<div>Logging in...</div>}>
-      <CallbackClient />
-    </Suspense>
-  )
+    <div className="min-h-screen flex items-center justify-center">
+      <p className="text-gray-600">Logging in...</p>
+    </div>
+  );
 }
