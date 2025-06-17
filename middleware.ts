@@ -10,11 +10,11 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("access_token")?.value
 
   if (!isPublicPath && !token) {
-    const redirectTo = `${request.nextUrl.origin}/auth/callback`
-    const loginUrl = `https://ai-search-hr-api-dfbahehtdkaxh7c2.centralus-01.azurewebsites.net/api/auth/login?redirect=${encodeURIComponent(
-      redirectTo
-    )}`
-    return NextResponse.redirect(loginUrl)
+    // const redirectTo = `${request.nextUrl.origin}/auth/callback`
+    // const loginUrl = `https://ai-search-hr-api-dfbahehtdkaxh7c2.centralus-01.azurewebsites.net/api/auth/login?redirect=${encodeURIComponent(
+    //   redirectTo
+    // )}`
+    // return NextResponse.redirect(loginUrl)
   }
 
   return NextResponse.next()
