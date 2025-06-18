@@ -32,9 +32,9 @@ const menuItems = [
     label: "Employee Enablement",
     icon: HrIcon,
     subItems: [
-      { label: "HR Compensation & Benefits", href: "/talent-acquisition", icon: ArroTabIcon },
-      { label: "Finance Analysis", href: "/talent-acquisition", icon: ArroTabIcon },
-      { label: "Legal Analysis", href: "/talent-acquisition", icon: ArroTabIcon },
+      { label: "HR Compensation & Benefits", href: "/human-resources", icon: ArroTabIcon },
+      { label: "Finance Analysis", href: "/", icon: ArroTabIcon },
+      { label: "Legal Analysis", href: "/", icon: ArroTabIcon },
     ],
   },
 ];
