@@ -17,13 +17,33 @@ import { decodeJWT } from "@/app/utils/decodeJWT";
 import WelcomeMessage from "./WelcomeMessage";
 import ChatMessages from "./ChatMessages";
 
+interface ExtractedData {
+  application_name: string;
+  problem_datetime: string;
+  confidence_score: number;
+  raw_datetime_mention: string;
+}
+
+interface Document {
+  _id: string;
+  Time: string;
+  Instance: string;
+  "CPU_%": string;
+  Handles: string;
+  Memory_PageFile_MB: string;
+  Memory_Private_MB: string;
+  Memory_Virtual_MB: string;
+  Threads: string;
+  "Working Set - Private": string;
+}
+
 type Message = {
-  sender: string;
+  sender: "user" | "ai";
   content: string;
   isLoading?: boolean;
   fileType?: string;
-  extracted_data?: any;
-  documents?: any[];
+  extracted_data?: ExtractedData;
+  documents?: Document[];
 };
 
 export default function Aisearch({ onSend }: { onSend: () => void }) {
@@ -79,10 +99,10 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
     setIsLoading(true);
 
     if (query?.trim()) {
-      setMessages((prev) => [...prev, { sender: "user", content: query }]);
+      setMessages((prev) => [...prev, { sender: "user", content: query } as Message]);
     }
 
-    setMessages((prev) => [...prev, { sender: "ai", content: "Thinking...", isLoading: true }]);
+    setMessages((prev) => [...prev, { sender: "ai", content: "Thinking...", isLoading: true } as Message]);
 
     setQuery("");
 
@@ -105,7 +125,7 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
                 sender: "user",
                 content: `📎 ${fileName}`,
                 fileType: fileType,
-              },
+              } as Message,
             ])
           );
         }
@@ -137,7 +157,7 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
             content: data.message,
             extracted_data: data.extracted_data,
             documents: data.documents || [],
-          },
+          } as Message,
         ])
       );
       setConversationHistory(data?.conversation_history);
@@ -145,7 +165,7 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
       console.error("Error during ask:", err);
       setMessages((prev) =>
         prev.filter((msg) => !msg.isLoading).concat([
-          { sender: "ai", content: "Something went wrong." },
+          { sender: "ai", content: "Something went wrong." } as Message,
         ])
       );
     }
