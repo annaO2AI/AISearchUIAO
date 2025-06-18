@@ -1,10 +1,33 @@
+// ChatMessages.tsx
 import { LoganimationsIcon, DOCIcon, PDFIcon, LogIcon } from "./icons";
+
+interface ExtractedData {
+  application_name: string;
+  problem_datetime: string;
+  confidence_score: number;
+  raw_datetime_mention: string;
+}
+
+interface Document {
+  _id: string;
+  Time: string;
+  Instance: string;
+  "CPU_%": string;
+  "Handles": string;
+  "Memory_PageFile_MB": string;
+  "Memory_Private_MB": string;
+  "Memory_Virtual_MB": string;
+  "Threads": string;
+  "Working Set - Private": string;
+}
 
 interface Message {
   sender: "user" | "ai";
   content: string;
   isLoading?: boolean;
   fileType?: string;
+  extracted_data?: ExtractedData;
+  documents?: Document[];
 }
 
 interface ChatMessagesProps {
@@ -13,15 +36,60 @@ interface ChatMessagesProps {
 }
 
 export default function ChatMessages({ messages, initials }: ChatMessagesProps) {
-  // Function to format markdown content
-  const formatMessageContent = (content: string) => {
-    return content
-      // Convert ### 1. **Title** to ◉ <strong>1. Title</strong>
-      .replace(/###\s*(\d+\.\s*)\*\*([^\*]+)\*\*/g, "<strong>$1$2</strong>")
-      // Convert remaining **text** to <strong>text</strong>
+  const formatMessageContent = (content: string, extracted_data?: ExtractedData, documents?: Document[]) => {
+    let formattedContent = content
       .replace(/\*\*([^\*]+)\*\*/g, "<strong>$1</strong>")
-      // Convert newlines to <br /> for proper rendering
       .replace(/\n/g, "<br />");
+
+    if (extracted_data) {
+      formattedContent += `<br /><br /><strong>Extracted Information:</strong><br />`;
+      formattedContent += `Application: ${extracted_data.application_name}<br />`;
+      formattedContent += `Problem Time: ${extracted_data.problem_datetime}<br />`;
+      formattedContent += `Confidence Score: ${(extracted_data.confidence_score * 100).toFixed(2)}%<br />`;
+      formattedContent += `Time Mention: ${extracted_data.raw_datetime_mention}<br />`;
+    }
+    if (documents && documents.length > 0) {
+      formattedContent += `<br /><strong>Performance Metrics:</strong>`;
+      formattedContent += `
+        <div class="overflow-x-auto leading-0" >
+          <table class="min-w-full border-collapse border border-gray-200 ">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="border border-gray-200 px-4 py-2 text-left text-md font-medium">Time</th>
+                <th class="border border-gray-200 px-4 py-2 text-left text-md font-medium">CPU %</th>
+                <th class="border border-gray-200 px-4 py-2 text-left text-xs font-medium">Handles</th>
+                <th class="border border-gray-200 px-4 py-2 text-left text-xs font-medium">Memory PageFile (MB)</th>
+                <th class="border border-gray-200 px-4 py-2 text-left text-xs font-medium">Memory Private (MB)</th>
+                <th class="border border-gray-200 px-4 py-2 text-left text-xs font-medium">Memory Virtual (MB)</th>
+                <th class="border border-gray-200 px-4 py-2 text-left text-xs font-medium">Threads</th>
+                <th class="border border-gray-200 px-4 py-2 text-left text-xs font-medium">Working Set - Private</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      documents.forEach((doc) => {
+        formattedContent += `
+          <tr>
+            <td class="border border-gray-200 px-4 py-2 text-sm">${doc.Time}</td>
+            <td class="border border-gray-200 px-4 py-2 text-sm">${doc["CPU_%"]}</td>
+            <td class="border border-gray-200 px-4 py-2 text-sm">${doc.Handles}</td>
+            <td class="border border-gray-200 px-4 py-2 text-sm">${doc.Memory_PageFile_MB}</td>
+            <td class="border border-gray-200 px-4 py-2 text-sm">${doc.Memory_Private_MB}</td>
+            <td class="border border-gray-200 px-4 py-2 text-sm">${doc.Memory_Virtual_MB}</td>
+            <td class="border border-gray-200 px-4 py-2 text-sm">${doc.Threads}</td>
+            <td class="border border-gray-200 px-4 py-2 text-sm">${doc["Working Set - Private"]}</td>
+          </tr>
+        `;
+      });
+      formattedContent += `
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    return formattedContent;
   };
 
   return (
@@ -36,7 +104,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
           {msg.sender === "user" && !msg.isLoading ? (
             <div>
               {initials && (
-                <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-normal text-xs">
+                <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-normal text-md">
                   {initials}
                 </div>
               )}
@@ -47,7 +115,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
             <div></div>
           )}
           <div
-            className={`max-w-[70%] rounded-xl text-sm ${
+            className={`max-w-[100%] rounded-xl text-sm ${
               msg.sender === "user"
                 ? "bg-white font-bold border-o3 px-4 py-3 boxshadow rounded-br-none"
                 : msg.isLoading
@@ -69,9 +137,9 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
               </div>
             ) : (
               <div
-                className="font-sans whitespace-pre-wrap break-words m-0 leading-7"
+                className="font-sans whitespace-pre-wrap break-words m-0"
                 dangerouslySetInnerHTML={{
-                  __html: formatMessageContent(msg.content),
+                  __html: formatMessageContent(msg.content, msg.extracted_data, msg.documents),
                 }}
               />
             )}
