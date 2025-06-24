@@ -1,3 +1,4 @@
+import React from "react";
 import { LoganimationsIcon, DOCIcon, PDFIcon, LogIcon } from "./icons";
 
 interface Message {

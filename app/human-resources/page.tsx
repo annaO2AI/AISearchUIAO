@@ -30,7 +30,7 @@ export default function TalentAcquisitionPage() {
 
   return (
     <DashboardProvider>
-      <div className="flex min-h-screen overflow-hidden">
+      <div className="flex  overflow-hidden">
         {showSidebar && (
           <Sidebar
             collapsed={collapsed}

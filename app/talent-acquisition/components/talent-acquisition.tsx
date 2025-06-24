@@ -219,6 +219,7 @@ useEffect(() => {
 
   return (
     <div id="chat-box-main" ref={chatContainerRef} className="flex flex-col minarea-max-hright">
+      
       <div
         className={
           messages.length === 0

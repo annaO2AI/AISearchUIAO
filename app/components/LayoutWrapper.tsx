@@ -9,6 +9,7 @@ import FooterAISearch from "../chat-ui/components/Footer"
 import { DashboardProvider } from "../context/DashboardContext"
 import PopupComponent from "../chat-ui/components/PopupComponent"
 import Popupprofile from "../components/Popupprofile"
+import Breadcrumbs from "./dashboard/Breadcrumbs"; // Import the new component
 
 export default function LayoutWrapper({ children }: { children: ReactNode }) {
   const pathname = usePathname()
@@ -54,6 +55,7 @@ export default function LayoutWrapper({ children }: { children: ReactNode }) {
               <HeaderAISearch  sidebarOpen={showSidebar && isSidebarExpanded}/>
               {/* <Popupprofile /> */}
                <PopupComponent /> 
+               <Breadcrumbs /> {/* Add Breadcrumbs here */}
             </>
           <main className={`flex-1 ${isAltLayout}?mt-1:mt-16 overflow-auto p-2 backround-chat-ui`} >
             {children}

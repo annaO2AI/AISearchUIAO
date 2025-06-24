@@ -80,7 +80,7 @@ export default function HeaderAISearch({ sidebarOpen }: HeaderProps) {
           >
             AI ChatBot
           </Link>
-          <Link
+          {/* <Link
             href="/about"
             className={`transition ${
               pathname === "/about" ? "ot-title font-semibold activenavigation py-2 px-4 rounded-md" : "text-gray-700 hover:ot-title py-2 px-4 rounded-md"
@@ -95,7 +95,7 @@ export default function HeaderAISearch({ sidebarOpen }: HeaderProps) {
             }`}
           >
             Contact
-          </Link>
+          </Link> */}
         </nav>
           <div className="flex flex-row gap-3 items-center">
             <button
