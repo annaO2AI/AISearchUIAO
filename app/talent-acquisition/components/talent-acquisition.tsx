@@ -1,15 +1,26 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { SendIcon, AIsearchIcon } from "./icons";
+import {
+  LoganimationsIcon,
+   SendIcon,
+   AttachemntIcon,
+   AIsearchIcon,
+   DOCIcon,
+   PDFIcon,
+   LogIcon
+} from "../components/icons";
 import { useAISearch } from "../../context/AISearchContext";
 import { fetchWithAuth } from "@/app/utils/axios";
 import { API_ROUTES } from "../../constants/api";
 import { decodeJWT } from "@/app/utils/decodeJWT";
 import FollowUpQuestions from "./FollowUpQuestions";
-import WelcomeMessage from "./WelcomeMessage";
+import WelcomeMessage from "./WelcomeMessage"; // Import the new component
 import ChatMessages from "./ChatMessages";
 
-export default function TalentAcquisition({ onSend }: { onSend: () => void }) {
+export default function Aisearch({ onSend }: { onSend: () => void }) {
+  const [fileName, setFileName] = useState("");
+  const [fileType, setFileType] = useState("");
+  const [fileInput, setFileInput] = useState<File | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -44,7 +55,7 @@ export default function TalentAcquisition({ onSend }: { onSend: () => void }) {
   useEffect(() => {
     const fetchConversationId = async () => {
       try {
-        const res = await fetchWithAuth(API_ROUTES.hrconversations, {
+        const res = await fetchWithAuth(API_ROUTES.conversations, {
           method: "POST",
         });
         const data = await res.json();
@@ -60,23 +71,20 @@ export default function TalentAcquisition({ onSend }: { onSend: () => void }) {
     fetchConversationId();
   }, [setConversationId]);
 
-function extractLastResponse(response: string): string {
-  // Replace ### titles with bullet point ◉ and remove ** from bold text
-  const formattedResponse = response
-    .replace(/###\s*(\d+\.\s*)\*\*([^\*]+)\*\*/g, "**$1$2**") // Convert ### 1. **Title** to ◉ **1. Title**
-    .replace(/\*\*([^\*]+)\*\*/g, "**$1**"); // Preserve bold formatting for rendering
-
-  // If the response has numbered items, extract and join them
-  if (formattedResponse.match(/\d+\s[^0-9]+/)) {
-    const matches = formattedResponse.match(/(\d+\s[^0-9]+)/g);
-    if (matches) {
-      return matches.map((item) => item.trim()).join("\n");
+  function extractLastResponse(response: string): string {
+    // Check if the response has numbered items pattern
+    if (response.match(/\d+\s[^0-9]+/)) {
+      // Split by numbers followed by space
+      const matches = response.match(/(\d+\s[^0-9]+)/g)
+      if (matches) {
+        // Join with proper line breaks between each numbered item
+        return matches.map((item) => item.trim()).join("\n")
+      }
     }
+    return response
   }
-  return formattedResponse;
-}
 
-  useEffect(() => {
+useEffect(() => {
   if (chatContainerRef.current) {
     setTimeout(() => {
       chatContainerRef.current!.scrollTo({
@@ -91,7 +99,7 @@ function extractLastResponse(response: string): string {
 }, [messages, isLoading]); // Added isLoading to dependencies
 
   const sendMessage = async () => {
-    if (!query?.trim()) return;
+    if (!query?.trim() && !fileInput) return;
 
     setIsLoading(true);
 
@@ -104,7 +112,40 @@ function extractLastResponse(response: string): string {
     setQuery("");
 
     try {
-      const res = await fetchWithAuth(API_ROUTES.hrask, {
+      if (fileName && fileInput) {
+        const formData = new FormData();
+        formData.append("file", fileInput);
+
+        const uploadRes = await fetchWithAuth(API_ROUTES.upload, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!uploadRes.ok) throw new Error("File upload failed");
+
+        if (fileInput) {
+          setMessages((prev) =>
+            prev.filter((msg) => !msg.isLoading).concat([
+              {
+                sender: "user",
+                content: `📎 ${fileName}`,
+                fileType: fileType,
+              },
+            ])
+          );
+        }
+      }
+
+      if (!query.trim() && !fileInput) {
+        setIsLoading(false);
+        setFileName("");
+        setFileType("");
+        setFileInput(null);
+        setMessages((prev) => prev.filter((msg) => !msg.isLoading));
+        return;
+      }
+
+      const res = await fetchWithAuth(API_ROUTES.ask, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -114,13 +155,13 @@ function extractLastResponse(response: string): string {
       });
 
       const data = await res.json();
-      const extracted = extractLastResponse(data?.response || "");
+      const extracted = extractLastResponse(data?.response || "")
 
       setMessages((prev) =>
         prev.filter((msg) => !msg.isLoading).concat([
           {
             sender: "ai",
-            content: extracted || data.response,
+           content: extracted || data.response,
             followup_questions: data.followup_questions || [],
           },
         ])
@@ -135,10 +176,23 @@ function extractLastResponse(response: string): string {
       );
     }
 
+    setFileName("");
+    setFileType("");
+    setFileInput(null);
     setIsLoading(false);
 
     if (inputRef.current && !isLoading) {
       inputRef.current.focus();
+    }
+  };
+
+  const handleFileChange = (e: any) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFileInput(file);
+      setFileName(file.name);
+      const extension = file.name.split(".").pop().toLowerCase();
+      setFileType(extension);
     }
   };
 
@@ -157,6 +211,7 @@ function extractLastResponse(response: string): string {
 
   const initials = getInitials(username);
 
+  // Get the latest AI message for follow-up questions
   const latestAIMessage = messages
     .slice()
     .reverse()
@@ -174,7 +229,7 @@ function extractLastResponse(response: string): string {
         <div className="flex flex-col gap-3 text-left mt-auto text-xs subtitle w-full max-w-7xl">
           {messages.length === 0 && <WelcomeMessage username={username} />}
           <div className="flex flex-col h-full">
-            <ChatMessages messages={messages} initials={initials} />
+          <ChatMessages messages={messages} initials={initials} />
             {latestAIMessage && (
               <FollowUpQuestions
                 followupQuestions={latestAIMessage.followup_questions || []}
@@ -191,7 +246,20 @@ function extractLastResponse(response: string): string {
                 isInputFocused ? "aisearchinput-focused" : ""
               }`}
             >
-              <div className="flex-1 text-gray-400 flex items-center space-x-2">
+              {fileName && (
+                <div className="flex flex-row mb-4">
+                  <div className="flex flex-row items-center rounded-md border border-solid border-gray-200 p-4 bg-white gap-4">
+                    {fileType === "doc" || fileType === "docx" ? (
+                      <DOCIcon width={26} />
+                    ) : null}
+                    {fileType === "pdf" ? <PDFIcon width={24} /> : null}
+                    {fileName && (
+                      <p className="text-sm text-gray-600">{fileName}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+              <div className="flex-1 text-gray-400 flex items-center space-x-2 mb-2">
                 <AIsearchIcon width={36} />
                 <input
                   type="text"
@@ -207,6 +275,19 @@ function extractLastResponse(response: string): string {
                   }`}
                   ref={inputRef}
                 />
+              </div>
+              <div className="flex flex-row w-full justify-between mb-2">
+                <div>
+                  <label className="cursor-pointer inline-flex items-center px-4 py-2 text-white rounded">
+                    <AttachemntIcon width={15} />
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      accept=".doc,.docx,.pdf"
+                    />
+                  </label>
+                </div>
                 <button
                   disabled={isLoading}
                   onClick={sendMessage}

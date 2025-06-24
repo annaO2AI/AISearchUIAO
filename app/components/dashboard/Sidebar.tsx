@@ -21,7 +21,7 @@ const menuItems = [
     label: "AI Search",
     icon: AiIcon,
     subItems: [
-      { label: "Talent Acquisition", href: "/", icon: ArroTabIcon },
+      { label: "Talent Acquisition", href: "/talent-acquisition", icon: ArroTabIcon },
       { label: "Procurement Search", href: "/", icon: ArroTabIcon },
       { label: "Finance Search", href: "/", icon: ArroTabIcon },
       { label: "Legal Search", href: "/", icon: ArroTabIcon },

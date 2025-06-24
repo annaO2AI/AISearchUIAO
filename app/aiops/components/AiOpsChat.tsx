@@ -242,7 +242,7 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
                 <AIsearchIcon width={36} />
                 <input
                   type="text"
-                  placeholder="I am facing Postman's issue - api retrieving problem 30 minutes ago"
+                  placeholder="Type your messsages here..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && sendMessage()}

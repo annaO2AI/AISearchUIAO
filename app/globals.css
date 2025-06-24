@@ -189,4 +189,7 @@ body {
   .main-toggleSidebar{
     margin-right: -35px;
   }
+  .imagfilter{
+    filter: brightness(0.98);
+  }
 }
