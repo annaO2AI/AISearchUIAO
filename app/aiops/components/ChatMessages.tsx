@@ -28,6 +28,7 @@ interface Message {
   fileType?: string;
   extracted_data?: ExtractedData;
   documents?: Document[];
+  recommendation?: string;
 }
 
 interface ChatMessagesProps {
@@ -36,17 +37,26 @@ interface ChatMessagesProps {
 }
 
 export default function ChatMessages({ messages, initials }: ChatMessagesProps) {
-  const formatMessageContent = (content: string, extracted_data?: ExtractedData, documents?: Document[]) => {
+  const formatMessageContent = (
+    content: string,
+    extracted_data?: ExtractedData,
+    documents?: Document[],
+    recommendation?: string
+  ) => {
     let formattedContent = content
       .replace(/\*\*([^\*]+)\*\*/g, "<strong>$1</strong>")
       .replace(/\n/g, "<br />");
 
     if (extracted_data) {
       formattedContent += `<br /><br /><strong>Extracted Information:</strong><br />`;
-      formattedContent += `Application: ${extracted_data.application_name || 'N/A'}<br />`;
-      formattedContent += `Problem Time: ${extracted_data.problem_datetime || 'N/A'}<br />`;
-      formattedContent += `Confidence Score: ${extracted_data.confidence_score ? (extracted_data.confidence_score * 100).toFixed(2) + '%' : 'N/A'}<br />`;
-      formattedContent += `Time Mention: ${extracted_data.raw_datetime_mention || 'N/A'}<br />`;
+      formattedContent += `Application: ${extracted_data.application_name || "N/A"}<br />`;
+      formattedContent += `Problem Time: ${extracted_data.problem_datetime || "N/A"}<br />`;
+      formattedContent += `Confidence Score: ${
+        extracted_data.confidence_score
+          ? (extracted_data.confidence_score * 100).toFixed(2) + "%"
+          : "N/A"
+      }<br />`;
+      formattedContent += `Time Mention: ${extracted_data.raw_datetime_mention || "N/A"}<br />`;
     }
 
     if (documents && Array.isArray(documents) && documents.length > 0) {
@@ -72,14 +82,14 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
       documents.forEach((doc) => {
         formattedContent += `
           <tr>
-            <td class="border border-gray-200 px-4 py-2">${doc.Time || 'N/A'}</td>
-            <td class="border border-gray-200 px-4 py-2">${doc["CPU_%"] || 'N/A'}</td>
-            <td class="border border-gray-200 px-4 py-2">${doc.Handles || 'N/A'}</td>
-            <td class="border border-gray-200 px-4 py-2">${doc.Memory_PageFile_MB || 'N/A'}</td>
-            <td class="border border-gray-200 px-4 py-2">${doc.Memory_Private_MB || 'N/A'}</td>
-            <td class="border border-gray-200 px-4 py-2">${doc.Memory_Virtual_MB || 'N/A'}</td>
-            <td class="border border-gray-200 px-4 py-2">${doc.Threads || 'N/A'}</td>
-            <td class="border border-gray-200 px-4 py-2">${doc["Working Set - Private"] || 'N/A'}</td>
+            <td class="border border-gray-200 px-4 py-2">${doc.Time || "N/A"}</td>
+            <td class="border border-gray-200 px-4 py-2">${doc["CPU_%"] || "N/A"}</td>
+            <td class="border border-gray-200 px-4 py-2">${doc.Handles || "N/A"}</td>
+            <td class="border border-gray-200 px-4 py-2">${doc.Memory_PageFile_MB || "N/A"}</td>
+            <td class="border border-gray-200 px-4 py-2">${doc.Memory_Private_MB || "N/A"}</td>
+            <td class="border border-gray-200 px-4 py-2">${doc.Memory_Virtual_MB || "N/A"}</td>
+            <td class="border border-gray-200 px-4 py-2">${doc.Threads || "N/A"}</td>
+            <td class="border border-gray-200 px-4 py-2">${doc["Working Set - Private"] || "N/A"}</td>
           </tr>
         `;
       });
@@ -89,6 +99,68 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
           </table>
         </div>
       `;
+    }
+
+    if (recommendation) {
+      formattedContent += `<br /><strong>Recommendation:</strong><br />`;
+
+      // Split recommendation into lines
+      const lines = recommendation.split("\n").filter((line) => line.trim());
+      let inList = false;
+      let listItems: string[] = [];
+
+      lines.forEach((line, index) => {
+        // Handle bold text
+        line = line.replace(/\*\*([^\*]+)\*\*/g, "<strong>$1</strong>");
+
+        // Detect section headers
+        if (line.startsWith("### ")) {
+          // Close previous list if open
+          if (inList && listItems.length > 0) {
+            formattedContent += `<ul class="list-disc pl-5">${listItems
+              .map((item) => `<li>${item}</li>`)
+              .join("")}</ul>`;
+            listItems = [];
+            inList = false;
+          }
+          // Add section as bold text
+          formattedContent += `<br /><strong>${line.replace("### ", "")}</strong><br /> `;
+        }
+        // Detect list items (e.g., "1. Check the API status:")
+        else if (
+          line.match(/^\d+\.\s/) &&
+          (line.includes("What does this mean for you?") ||
+            line.includes("What should you do?"))
+        ) {
+          // Start or continue a list
+          if (!inList) {
+            inList = true;
+          }
+          // Remove numbering (e.g., "1. ") and add to list items
+          const listItem = line.replace(/^\d+\.\s/, "").trim();
+          listItems.push(listItem);
+        }
+        // Handle other lines
+        else {
+          // Close previous list if open
+          if (inList && listItems.length > 0) {
+            formattedContent += `<ul class="list-disc pl-5">${listItems
+              .map((item) => `<li>${item}</li>`)
+              .join("")}</ul>`;
+            listItems = [];
+            inList = false;
+          }
+          // Add regular line
+          formattedContent += `${line}<br />`;
+        }
+
+        // Handle the last line
+        if (index === lines.length - 1 && inList && listItems.length > 0) {
+          formattedContent += `<ul class="list-disc pl-5">${listItems
+            .map((item) => `<li>${item}</li>`)
+            .join("")}</ul>`;
+        }
+      });
     }
 
     return formattedContent;
@@ -141,7 +213,12 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
               <div
                 className="font-sans whitespace-pre-wrap break-words m-0"
                 dangerouslySetInnerHTML={{
-                  __html: formatMessageContent(msg.content, msg.extracted_data, msg.documents),
+                  __html: formatMessageContent(
+                    msg.content,
+                    msg.extracted_data,
+                    msg.documents,
+                    msg.recommendation
+                  ),
                 }}
               />
             )}

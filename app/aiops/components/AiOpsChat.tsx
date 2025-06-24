@@ -157,6 +157,7 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
             content: data.message,
             extracted_data: data.extracted_data,
             documents: data.documents || [],
+            recommendation: data.recommendation, // Add recommendation
           } as Message,
         ])
       );
