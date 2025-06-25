@@ -24,7 +24,6 @@ export default function HumanResources({ onSend }: { onSend: () => void }) {
     setMessages,
     messages,
     conversationId,
-    setConversationHistory,
   } = useAISearch();
 
   useEffect(() => {
@@ -60,35 +59,24 @@ export default function HumanResources({ onSend }: { onSend: () => void }) {
     fetchConversationId();
   }, [setConversationId]);
 
-function extractLastResponse(response: string): string {
-  // Replace ### titles with bullet point ◉ and remove ** from bold text
-  const formattedResponse = response
-    .replace(/###\s*(\d+\.\s*)\*\*([^\*]+)\*\*/g, "**$1$2**") // Convert ### 1. **Title** to ◉ **1. Title**
-    .replace(/\*\*([^\*]+)\*\*/g, "**$1**"); // Preserve bold formatting for rendering
-
-  // If the response has numbered items, extract and join them
-  if (formattedResponse.match(/\d+\s[^0-9]+/)) {
-    const matches = formattedResponse.match(/(\d+\s[^0-9]+)/g);
-    if (matches) {
-      return matches.map((item) => item.trim()).join("\n");
-    }
+  // Simplified extractLastResponse to pass raw response
+  function extractLastResponse(response: string): string {
+    return response;
   }
-  return formattedResponse;
-}
 
   useEffect(() => {
-  if (chatContainerRef.current) {
-    setTimeout(() => {
-      chatContainerRef.current!.scrollTo({
-        top: chatContainerRef.current!.scrollHeight,
-        behavior: "smooth",
-      });
-    }, 0);
-  }
-  if (inputRef.current && !isLoading) {
-    inputRef.current.focus();
-  }
-}, [messages, isLoading]); // Added isLoading to dependencies
+    if (chatContainerRef.current) {
+      setTimeout(() => {
+        chatContainerRef.current!.scrollTo({
+          top: chatContainerRef.current!.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 0);
+    }
+    if (inputRef.current && !isLoading) {
+      inputRef.current.focus();
+    }
+  }, [messages, isLoading]);
 
   const sendMessage = async () => {
     if (!query?.trim()) return;
@@ -116,6 +104,7 @@ function extractLastResponse(response: string): string {
       const data = await res.json();
       const extracted = extractLastResponse(data?.response || "");
 
+      // Update messages and conversation_id, exclude conversation_history
       setMessages((prev) =>
         prev.filter((msg) => !msg.isLoading).concat([
           {
@@ -125,7 +114,11 @@ function extractLastResponse(response: string): string {
           },
         ])
       );
-      setConversationHistory(data?.conversation_history);
+
+      // Update conversation_id if a new one is provided
+      if (data?.conversation_id) {
+        setConversationId(data.conversation_id);
+      }
     } catch (err) {
       console.error("Error during ask:", err);
       setMessages((prev) =>

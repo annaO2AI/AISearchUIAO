@@ -5,6 +5,7 @@ interface Message {
   content: string;
   isLoading?: boolean;
   fileType?: string;
+  followup_questions?: string[];
 }
 
 interface ChatMessagesProps {
@@ -16,11 +17,13 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
   // Function to format markdown content
   const formatMessageContent = (content: string) => {
     return content
-      // Convert ### 1. **Title** to ◉ <strong>1. Title</strong>
-      .replace(/###\s*(\d+\.\s*)\*\*([^\*]+)\*\*/g, "<strong>$1$2</strong>")
-      // Convert remaining **text** to <strong>text</strong>
+      // Convert list items (- text) to HTML <li> for proper list rendering
+      .replace(/^- (.*)$/gm, "<li>$1</li>")
+      // Wrap list items in <ul> tags
+      .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>")
+      // Convert **text** to <strong>text</strong>
       .replace(/\*\*([^\*]+)\*\*/g, "<strong>$1</strong>")
-      // Convert newlines to <br /> for proper rendering
+      // Convert newlines to <br /> for non-list text
       .replace(/\n/g, "<br />");
   };
 
