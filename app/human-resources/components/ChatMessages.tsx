@@ -39,7 +39,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
           inList = false;
           return "</ul>" + (line ? `<br />${line}` : "");
         }
-        return line ? `<br />${line}` : "";
+        return line ? `${line}` : "";
       }
     });
 
