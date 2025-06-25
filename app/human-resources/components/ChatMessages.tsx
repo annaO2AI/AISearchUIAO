@@ -16,14 +16,37 @@ interface ChatMessagesProps {
 export default function ChatMessages({ messages, initials }: ChatMessagesProps) {
   // Function to format markdown content
   const formatMessageContent = (content: string) => {
-    return content
-      // Convert list items (- text) to HTML <li> for proper list rendering
-      .replace(/^- (.*)$/gm, "<li>$1</li>")
-      // Wrap list items in <ul> tags
-      .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>")
+    // Split content into lines for processing
+    let lines = content.split("\n");
+    
+    // Process lines to handle list items
+    let inList = false;
+    let formattedLines = lines.map((line) => {
+      if (line.trim().startsWith("- ")) {
+        if (!inList) {
+          inList = true;
+          return "<ul>" + line.replace(/^- (.*)$/, "<li>$1</li>");
+        }
+        return line.replace(/^- (.*)$/, "<li>$1</li>");
+      }
+      if (inList) {
+        inList = false;
+        return "</ul>" + line.replace(/\n/g, "<br />");
+      }
+      return line.replace(/\n/g, "<br />");
+    });
+
+    // Close the list if it was open at the end
+    if (inList) {
+      formattedLines.push("</ul>");
+    }
+
+    // Join lines and convert bold markdown
+    return formattedLines
+      .join("")
       // Convert **text** to <strong>text</strong>
       .replace(/\*\*([^\*]+)\*\*/g, "<strong>$1</strong>")
-      // Convert newlines to <br /> for non-list text
+      // Convert remaining newlines to <br />
       .replace(/\n/g, "<br />");
   };
 
