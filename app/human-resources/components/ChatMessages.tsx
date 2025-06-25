@@ -19,21 +19,28 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
     // Split content into lines for processing
     let lines = content.split("\n");
     
-    // Process lines to handle list items
+    // Process lines to handle titles, lists, and bold text
     let inList = false;
     let formattedLines = lines.map((line) => {
-      if (line.trim().startsWith("- ")) {
+      line = line.trim();
+      if (line.startsWith("### ")) {
+        // Handle ### as title (e.g., <h3>)
+        return `<h3>${line.replace("### ", "")}</h3>`;
+      } else if (line.startsWith("- ")) {
+        // Handle dash as list item
         if (!inList) {
           inList = true;
           return "<ul>" + line.replace(/^- (.*)$/, "<li>$1</li>");
         }
         return line.replace(/^- (.*)$/, "<li>$1</li>");
+      } else {
+        // Close list if it was open and handle non-list lines
+        if (inList) {
+          inList = false;
+          return "</ul>" + (line ? `<br />${line}` : "");
+        }
+        return line ? `<br />${line}` : "";
       }
-      if (inList) {
-        inList = false;
-        return "</ul>" + line.replace(/\n/g, "<br />");
-      }
-      return line.replace(/\n/g, "<br />");
     });
 
     // Close the list if it was open at the end
@@ -41,13 +48,13 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
       formattedLines.push("</ul>");
     }
 
-    // Join lines and convert bold markdown
+    // Join lines and apply bold formatting
     return formattedLines
       .join("")
       // Convert **text** to <strong>text</strong>
       .replace(/\*\*([^\*]+)\*\*/g, "<strong>$1</strong>")
-      // Convert remaining newlines to <br />
-      .replace(/\n/g, "<br />");
+      // Ensure proper spacing for non-list text
+      .replace(/<br \/><br \/>/g, "<br />");
   };
 
   return (
