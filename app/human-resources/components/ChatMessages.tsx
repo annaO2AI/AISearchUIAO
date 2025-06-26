@@ -30,11 +30,9 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
     );
   };
 
-  // Utility function to check if all table data is empty
-  const isTableEmpty = (arr: any[]): boolean => {
-    return arr.every((item) =>
-      Object.values(item).every((v) => v === null || v === undefined || v === "")
-    );
+  // Utility function to check if all values in a column are empty
+  const isColumnEmpty = (arr: any[], column: string): boolean => {
+    return arr.every((item) => item[column] === null || item[column] === undefined || item[column] === "");
   };
 
   // Utility function to format a single value
@@ -73,24 +71,25 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
                   const headers = Object.keys(value[0]).filter(
                     (k) => !["id", "_id"].includes(k.toLowerCase())
                   );
-                  if (!isTableEmpty(value)) {
-                    // Only render table and title if data is not empty
+                  // Filter out empty columns
+                  const nonEmptyHeaders = headers.filter((header) => !isColumnEmpty(value, header));
+                  if (nonEmptyHeaders.length > 0) {
                     html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong>`;
                     html += `<div class='overflow-x-auto'><table class='border-collapse border border-gray-300 w-full'><thead><tr>`;
-                    headers.forEach((header) => {
+                    nonEmptyHeaders.forEach((header) => {
                       html += `<th class='border p-2'>${header.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th>`;
                     });
                     html += `</tr></thead><tbody>`;
                     value.forEach((row) => {
                       html += `<tr>`;
-                      headers.forEach((header) => {
+                      nonEmptyHeaders.forEach((header) => {
                         html += `<td class='border p-2'>${formatValue(row[header])}</td>`;
                       });
                       html += `</tr>`;
                     });
                     html += `</tbody></table></div></li>`;
                   } else {
-                    // Render minimal output for empty table
+                    // No valid columns, show minimal message
                     html += `<li><p>(No valid data available)</p></li>`;
                   }
                 } else {
@@ -198,7 +197,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
             <div></div>
           )}
           <div
-            className={`max-w-[70%] rounded-xl text-sm chatmassage-wrapper ${
+            className={`max-w-[99%] rounded-xl text-sm chatmassage-wrapper ${
               msg.sender === "user"
                 ? "bg-white font-bold border-o3 px-4 py-3 boxshadow rounded-br-none"
                 : msg.isLoading
