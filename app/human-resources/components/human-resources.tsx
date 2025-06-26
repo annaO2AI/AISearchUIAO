@@ -2,9 +2,9 @@
 import { useEffect, useState, useRef } from "react";
 import { SendIcon, AIsearchIcon } from "./icons";
 import { useAISearch } from "../../context/AISearchContext";
-import { fetchWithAuth } from "@/app/utils/axios";
+import { fetchWithAuth } from "../../utils/axios";
 import { API_ROUTES } from "../../constants/api";
-import { decodeJWT } from "@/app/utils/decodeJWT";
+import { decodeJWT } from "../../utils/decodeJWT";
 import FollowUpQuestions from "./FollowUpQuestions";
 import WelcomeMessage from "./WelcomeMessage";
 import ChatMessages from "./ChatMessages";
@@ -48,8 +48,7 @@ export default function HumanResources({ onSend }: { onSend: () => void }) {
         });
         const data = await res.json();
         if (data?.conversation_id) {
-          console.log(data.conversation_id);
-          setConversationId(data?.conversation_id);
+          setConversationId(data.conversation_id);
         }
       } catch (err) {
         console.error("Failed to fetch conversation ID:", err);
@@ -59,9 +58,9 @@ export default function HumanResources({ onSend }: { onSend: () => void }) {
     fetchConversationId();
   }, [setConversationId]);
 
-  // Simplified extractLastResponse to pass raw response
-  function extractLastResponse(response: string): string {
-    return response;
+  // Extract only the response field
+  function extractLastResponse(data: any): any {
+    return data.response || "No response received.";
   }
 
   useEffect(() => {
@@ -102,14 +101,14 @@ export default function HumanResources({ onSend }: { onSend: () => void }) {
       });
 
       const data = await res.json();
-      const extracted = extractLastResponse(data?.response || "");
+      const extracted = extractLastResponse(data);
 
-      // Update messages and conversation_id, exclude conversation_history
+      // Update messages with only the latest response, exclude conversation_history
       setMessages((prev) =>
         prev.filter((msg) => !msg.isLoading).concat([
           {
             sender: "ai",
-            content: extracted || data.response,
+            content: extracted,
             followup_questions: data.followup_questions || [],
           },
         ])
