@@ -45,11 +45,11 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
         .join("")
         .replace(/\*\*([^\*]+)\*\*/g, "<strong>$1</strong>")
         .replace(/<br \/><br \/>/g, "<br />");
-    } else if (typeof content === "object" && content.data && content.recommendation) {
-      // Handle JSON response with employeeDetails or vendor data
+    } else if (typeof content === "object" && content.recommendation) {
+      // Handle JSON response, always display recommendation if present
       let html = `<p>${content.recommendation}</p>`;
 
-      if (content.data.employeeDetails) {
+      if (content.data && content.data.employeeDetails) {
         const emp = content.data.employeeDetails;
         html += `<h3>Employee Details</h3>`;
         // Basic Info
@@ -114,7 +114,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
           });
           html += `</ul>`;
         }
-      } else if (Array.isArray(content.data)) {
+      } else if (content.data && Array.isArray(content.data)) {
         // Handle Vendor Data
         const vendor = content.data[0];
         html += `<h3>Vendor Details</h3>`;
