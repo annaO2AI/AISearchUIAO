@@ -198,4 +198,27 @@ body {
     right: 0;
     background-color: #fafafa;
   }
+  .chatmassage-wrapper h3{
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    padding: 2px 1px;
+  }
+
+  .chatmassage-wrapper h4{
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 10px;
+    background-color: #f9f9f9;
+    margin-bottom: 5px;
+    padding: 2px 1px;
+  }
+  .chatmassage-wrapper ul{
+      list-style: outside;
+    margin-left: 20px;
+  }
+  .chatmassage-wrapper li{
+      margin-bottom: 15px;
+  }
 }

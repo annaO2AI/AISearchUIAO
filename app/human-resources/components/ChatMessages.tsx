@@ -189,7 +189,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
             <div></div>
           )}
           <div
-            className={`max-w-[70%] rounded-xl text-sm ${
+            className={`max-w-[70%] rounded-xl text-sm chatmassage-wrapper ${
               msg.sender === "user"
                 ? "bg-white font-bold border-o3 px-4 py-3 boxshadow rounded-br-none"
                 : msg.isLoading
