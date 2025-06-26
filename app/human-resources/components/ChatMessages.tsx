@@ -15,29 +15,37 @@ interface ChatMessagesProps {
 
 export default function ChatMessages({ messages, initials }: ChatMessagesProps) {
   // Utility function to determine if an array is suitable for a table
-  const isTableData = (arr: any[]): boolean => {
+  const isTableData = (arr: any[], key: string): boolean => {
     if (!arr.length) return false;
     const firstItem = arr[0];
-    // Consider it table data if the first item is an object with at least 2 keys
-    return typeof firstItem === "object" && Object.keys(firstItem).length >= 2;
+    // Only consider it table data if the array is under a key suggesting a tabular structure
+    // and the first item is an object with at least 2 keys
+    const tableKeys = ["job_details", "document_details"]; // Add more keys as needed
+    return (
+      typeof firstItem === "object" &&
+      Object.keys(firstItem).length >= 2 &&
+      tableKeys.includes(key)
+    );
   };
 
   // Utility function to format a single value
   const formatValue = (value: any): string => {
     if (value === null || value === undefined) return "N/A";
-    if (typeof value === "object") {
-      return JSON.stringify(value); // Fallback for complex nested objects
+    if (typeof value === "object" && !Array.isArray(value)) {
+      return Object.entries(value)
+        .map(([k, v]) => `${k}: ${formatValue(v)}`)
+        .join(", ");
     }
     return String(value);
   };
 
   // Function to dynamically format JSON data
-  const formatJsonData = (data: any, depth: number = 0): string => {
+  const formatJsonData = (data: any, depth: number = 0, parentKey: string = ""): string => {
     let html = "";
 
     if (Array.isArray(data)) {
-      if (isTableData(data)) {
-        // Render as a table
+      if (isTableData(data, parentKey)) {
+        // Render as a table only for specific keys
         const headers = Object.keys(data[0]).filter(
           (key) => !["id", "_id"].includes(key) // Exclude common ID fields
         );
@@ -55,15 +63,16 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
         });
         html += `</tbody></table>`;
       } else {
-        // Render as a list
+        // Render as a list for non-table arrays
         html += `<ul>`;
-        data.forEach((item) => {
-          if (typeof item === "object") {
-            // For objects, show key-value pairs or a summary
-            const summary = Object.entries(item)
-              .map(([k, v]) => `${k}: ${formatValue(v)}`)
-              .join(", ");
-            html += `<li>${summary}</li>`;
+        data.forEach((item, index) => {
+          if (typeof item === "object" && item !== null) {
+            html += `<li><strong>${parentKey || `Item ${index + 1}`}</strong>`;
+            html += `<ul>`;
+            Object.entries(item).forEach(([key, value]) => {
+              html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</li>`;
+            });
+            html += `</ul></li>`;
           } else {
             html += `<li>${formatValue(item)}</li>`;
           }
@@ -75,10 +84,10 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
       Object.entries(data).forEach(([key, value]) => {
         if (Array.isArray(value)) {
           html += `<h${depth + 3}>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h${depth + 3}>`;
-          html += formatJsonData(value, depth + 1);
+          html += formatJsonData(value, depth + 1, key);
         } else if (typeof value === "object" && value !== null) {
           html += `<h${depth + 3}>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h${depth + 3}>`;
-          html += formatJsonData(value, depth + 1);
+          html += formatJsonData(value, depth + 1, key);
         } else {
           html += `<p><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</p>`;
         }
@@ -156,7 +165,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
             <div></div>
           )}
           <div
-            className={`max-w-[70%] rounded-xl text-sm chatmassage-wrapper ${
+            className={`max-w-[98%] rounded-xl text-sm chatmassage-wrapper ${
               msg.sender === "user"
                 ? "bg-white font-bold border-o3 px-4 py-3 boxshadow rounded-br-none"
                 : msg.isLoading
