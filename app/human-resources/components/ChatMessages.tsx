@@ -19,12 +19,14 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
     if (!arr.length) return false;
     const firstItem = arr[0];
     // Consider it table data if the first item is an object with at least 2 keys
-    // and the key suggests a tabular structure (customizable list)
-    const tableKeys = ["job_details", "document_details", "user_defined_fields"];
+    // and the data appears structured (e.g., consistent key-value pairs)
     return (
       typeof firstItem === "object" &&
       Object.keys(firstItem).length >= 2 &&
-      tableKeys.includes(key.toLowerCase())
+      Object.values(firstItem).every(
+        (v) => typeof v === "string" || typeof v === "number" || v === null
+      ) &&
+      !["locations", "documents_data"].includes(key.toLowerCase()) // Exclude sparse arrays
     );
   };
 
@@ -51,14 +53,16 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
       } else {
         data.forEach((item, index) => {
           if (typeof item === "object" && item !== null) {
-            // Use parentKey or index-based label for multiple items
-            const label = parentKey ? parentKey : `Item ${index + 1}`;
-            html += `<h${depth + 3}>${label}</h${depth + 3}>`;
+            // Use parentKey as the heading, avoiding duplication
+            const heading = parentKey ? parentKey.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : `Entry ${index + 1}`;
+            if (heading !== "Item") { // Skip default labels
+              html += `<h${depth + 3}>${heading}</h${depth + 3}>`;
+            }
             html += `<ul>`;
             Object.entries(item).forEach(([key, value]) => {
               if (Array.isArray(value)) {
                 if (isTableData(value, key)) {
-                  // Render as table for specific keys
+                  // Render as table for structured data
                   const headers = Object.keys(value[0]).filter(
                     (k) => !["id", "_id"].includes(k.toLowerCase())
                   );
@@ -77,7 +81,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
                   });
                   html += `</tbody></table></li>`;
                 } else {
-                  // Render as nested list for non-table arrays
+                  // Render as nested list for non-structured arrays
                   html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong>`;
                   html += formatJsonData(value, depth + 1, key);
                   html += `</li>`;
