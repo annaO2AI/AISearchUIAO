@@ -30,6 +30,13 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
     );
   };
 
+  // Utility function to check if all table data is empty
+  const isTableEmpty = (arr: any[]): boolean => {
+    return arr.every((item) =>
+      Object.values(item).every((v) => v === null || v === undefined || v === "")
+    );
+  };
+
   // Utility function to format a single value
   const formatValue = (value: any): string => {
     if (value === null || value === undefined) return "N/A";
@@ -55,7 +62,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
           if (typeof item === "object" && item !== null) {
             // Use parentKey as the heading, avoiding duplication
             const heading = parentKey ? parentKey.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : `Entry ${index + 1}`;
-            if (heading !== "Item") { // Skip default labels
+            if (heading !== "Item") {
               html += `<h${depth + 3}>${heading}</h${depth + 3}>`;
             }
             html += `<ul>`;
@@ -66,20 +73,26 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
                   const headers = Object.keys(value[0]).filter(
                     (k) => !["id", "_id"].includes(k.toLowerCase())
                   );
-                  html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong>`;
-                  html += `<table class='border-collapse border border-gray-300 w-full'><thead><tr>`;
-                  headers.forEach((header) => {
-                    html += `<th class='border p-2'>${header.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th>`;
-                  });
-                  html += `</tr></thead><tbody>`;
-                  value.forEach((row) => {
-                    html += `<tr>`;
+                  if (!isTableEmpty(value)) {
+                    // Only render table and title if data is not empty
+                    html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong>`;
+                    html += `<div class='overflow-x-auto'><table class='border-collapse border border-gray-300 w-full'><thead><tr>`;
                     headers.forEach((header) => {
-                      html += `<td class='border p-2'>${formatValue(row[header])}</td>`;
+                      html += `<th class='border p-2'>${header.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th>`;
                     });
-                    html += `</tr>`;
-                  });
-                  html += `</tbody></table></li>`;
+                    html += `</tr></thead><tbody>`;
+                    value.forEach((row) => {
+                      html += `<tr>`;
+                      headers.forEach((header) => {
+                        html += `<td class='border p-2'>${formatValue(row[header])}</td>`;
+                      });
+                      html += `</tr>`;
+                    });
+                    html += `</tbody></table></div></li>`;
+                  } else {
+                    // Render minimal output for empty table
+                    html += `<li><p>(No valid data available)</p></li>`;
+                  }
                 } else {
                   // Render as nested list for non-structured arrays
                   html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong>`;
