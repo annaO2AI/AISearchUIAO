@@ -18,13 +18,13 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
   const isTableData = (arr: any[], key: string): boolean => {
     if (!arr.length) return false;
     const firstItem = arr[0];
-    // Only consider it table data if the array is under a key suggesting a tabular structure
-    // and the first item is an object with at least 2 keys
-    const tableKeys = ["job_details", "document_details"]; // Add more keys as needed
+    // Consider it table data if the first item is an object with at least 2 keys
+    // and the key suggests a tabular structure (customizable list)
+    const tableKeys = ["job_details", "document_details", "user_defined_fields"];
     return (
       typeof firstItem === "object" &&
       Object.keys(firstItem).length >= 2 &&
-      tableKeys.includes(key)
+      tableKeys.includes(key.toLowerCase())
     );
   };
 
@@ -51,27 +51,41 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
       } else {
         data.forEach((item, index) => {
           if (typeof item === "object" && item !== null) {
-            html += `<h${depth + 3}>${parentKey || `Vendor ${index + 1}`}</h${depth + 3}>`;
+            // Use parentKey or index-based label for multiple items
+            const label = parentKey ? parentKey : `Item ${index + 1}`;
+            html += `<h${depth + 3}>${label}</h${depth + 3}>`;
             html += `<ul>`;
             Object.entries(item).forEach(([key, value]) => {
               if (Array.isArray(value)) {
-                html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong>`;
-                html += `<ul>`;
-                value.forEach((subItem, subIndex) => {
-                  if (typeof subItem === "object" && subItem !== null) {
-                    html += `<li><strong>Item ${subIndex + 1}</strong>`;
-                    html += `<ul>`;
-                    Object.entries(subItem).forEach(([subKey, subValue]) => {
-                      html += `<li><strong>${subKey.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(subValue)}</li>`;
+                if (isTableData(value, key)) {
+                  // Render as table for specific keys
+                  const headers = Object.keys(value[0]).filter(
+                    (k) => !["id", "_id"].includes(k.toLowerCase())
+                  );
+                  html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong>`;
+                  html += `<table class='border-collapse border border-gray-300 w-full'><thead><tr>`;
+                  headers.forEach((header) => {
+                    html += `<th class='border p-2'>${header.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th>`;
+                  });
+                  html += `</tr></thead><tbody>`;
+                  value.forEach((row) => {
+                    html += `<tr>`;
+                    headers.forEach((header) => {
+                      html += `<td class='border p-2'>${formatValue(row[header])}</td>`;
                     });
-                    html += `</ul></li>`;
-                  } else {
-                    html += `<li>${formatValue(subItem)}</li>`;
-                  }
-                });
-                html += `</ul></li>`;
+                    html += `</tr>`;
+                  });
+                  html += `</tbody></table></li>`;
+                } else {
+                  // Render as nested list for non-table arrays
+                  html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong>`;
+                  html += formatJsonData(value, depth + 1, key);
+                  html += `</li>`;
+                }
               } else if (typeof value === "object" && value !== null) {
-                html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</li>`;
+                html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong>`;
+                html += formatJsonData(value, depth + 1, key);
+                html += `</li>`;
               } else {
                 html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</li>`;
               }
@@ -96,7 +110,6 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
         }
       });
     } else {
-      // Render as a paragraph
       html += `<p>${formatValue(data)}</p>`;
     }
 
@@ -168,7 +181,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
             <div></div>
           )}
           <div
-            className={`max-w-[92%] rounded-xl text-sm chatmassage-wrapper ${
+            className={`max-w-[70%] rounded-xl text-sm chatmassage-wrapper ${
               msg.sender === "user"
                 ? "bg-white font-bold border-o3 px-4 py-3 boxshadow rounded-br-none"
                 : msg.isLoading
