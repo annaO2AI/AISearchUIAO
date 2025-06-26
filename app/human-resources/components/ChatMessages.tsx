@@ -31,9 +31,11 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
   // Utility function to format a single value
   const formatValue = (value: any): string => {
     if (value === null || value === undefined) return "N/A";
-    if (typeof value === "object" && !Array.isArray(value)) {
+    if (Array.isArray(value)) {
+      return formatJsonData(value); // Recursively format arrays
+    } else if (typeof value === "object" && value !== null) {
       return Object.entries(value)
-        .map(([k, v]) => `${k}: ${formatValue(v)}`)
+        .map(([k, v]) => `${k.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}: ${formatValue(v)}`)
         .join(", ");
     }
     return String(value);
@@ -44,40 +46,41 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
     let html = "";
 
     if (Array.isArray(data)) {
-      if (isTableData(data, parentKey)) {
-        // Render as a table only for specific keys
-        const headers = Object.keys(data[0]).filter(
-          (key) => !["id", "_id"].includes(key) // Exclude common ID fields
-        );
-        html += `<table class='border-collapse border border-gray-300 w-full'><thead><tr>`;
-        headers.forEach((header) => {
-          html += `<th class='border p-2'>${header.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th>`;
-        });
-        html += `</tr></thead><tbody>`;
-        data.forEach((item) => {
-          html += `<tr>`;
-          headers.forEach((header) => {
-            html += `<td class='border p-2'>${formatValue(item[header])}</td>`;
-          });
-          html += `</tr>`;
-        });
-        html += `</tbody></table>`;
+      if (data.length === 0) {
+        html += `<p>(No data available)</p>`;
       } else {
-        // Render as a list for non-table arrays
-        html += `<ul>`;
         data.forEach((item, index) => {
           if (typeof item === "object" && item !== null) {
-            html += `<li><strong>${parentKey || `Item ${index + 1}`}</strong>`;
+            html += `<h${depth + 3}>${parentKey || `Vendor ${index + 1}`}</h${depth + 3}>`;
             html += `<ul>`;
             Object.entries(item).forEach(([key, value]) => {
-              html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</li>`;
+              if (Array.isArray(value)) {
+                html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong>`;
+                html += `<ul>`;
+                value.forEach((subItem, subIndex) => {
+                  if (typeof subItem === "object" && subItem !== null) {
+                    html += `<li><strong>Item ${subIndex + 1}</strong>`;
+                    html += `<ul>`;
+                    Object.entries(subItem).forEach(([subKey, subValue]) => {
+                      html += `<li><strong>${subKey.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(subValue)}</li>`;
+                    });
+                    html += `</ul></li>`;
+                  } else {
+                    html += `<li>${formatValue(subItem)}</li>`;
+                  }
+                });
+                html += `</ul></li>`;
+              } else if (typeof value === "object" && value !== null) {
+                html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</li>`;
+              } else {
+                html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</li>`;
+              }
             });
-            html += `</ul></li>`;
+            html += `</ul>`;
           } else {
             html += `<li>${formatValue(item)}</li>`;
           }
         });
-        html += `</ul>`;
       }
     } else if (typeof data === "object" && data !== null) {
       // Render as paragraphs or nested sections
@@ -165,7 +168,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
             <div></div>
           )}
           <div
-            className={`max-w-[98%] rounded-xl text-sm chatmassage-wrapper ${
+            className={`max-w-[92%] rounded-xl text-sm chatmassage-wrapper ${
               msg.sender === "user"
                 ? "bg-white font-bold border-o3 px-4 py-3 boxshadow rounded-br-none"
                 : msg.isLoading
