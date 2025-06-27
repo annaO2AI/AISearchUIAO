@@ -63,7 +63,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
                   );
                   html += `<table class='border-collapse border border-gray-300 w-full'><thead><tr>`;
                   headers.forEach((header) => {
-                    html += `<th class='border p-2'>${header.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th>`;
+                    html += `<th class='border p-2 w-[250px]'>${header.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th>`;
                   });
                   html += `</tr></thead><tbody>`;
                   value.forEach((row) => {
@@ -176,7 +176,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
             <div></div>
           )}
           <div
-            className={`max-w-[70%] rounded-xl text-sm chatmassage-wrapper ${
+            className={`max-w-[99%] rounded-xl text-sm chatmassage-wrapper ${
               msg.sender === "user"
                 ? "bg-white font-bold border-o3 px-4 py-3 boxshadow rounded-br-none"
                 : msg.isLoading
