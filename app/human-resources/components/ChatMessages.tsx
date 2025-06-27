@@ -47,7 +47,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
   };
 
   // Function to dynamically format JSON data
-  const formatJsonData = (data: any, depth: number = 0, parentKey: string = ""): string => {
+  const formatJsonData = (data: any, depth: number = 0, parentKey: string = "", hasHeading: boolean = false): string => {
     let html = "";
 
     if (Array.isArray(data)) {
@@ -56,9 +56,10 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
       } else {
         data.forEach((item, index) => {
           if (typeof item === "object" && item !== null) {
-            // Use parentKey as the heading with <h3>
-            if (parentKey && index === 0) {
+            // Add heading only for the first item if not already set
+            if (parentKey && index === 0 && !hasHeading) {
               html += `<h3>${parentKey.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h3>`;
+              hasHeading = true; // Mark heading as added
             }
             const nonEmptyEntries = Object.entries(item).filter(([_, value]) => !isEmptyValue(value));
             if (nonEmptyEntries.length > 0) {
@@ -93,10 +94,11 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
                     }
                   }
                 } else if (typeof value === "object" && value !== null) {
-                  html += formatJsonData(value, depth + 1, key);
+                  // Recurse with heading flag to avoid duplication
+                  html += formatJsonData(value, depth + 1, key, hasHeading);
                 } else if (!isEmptyValue(value)) {
                   // Use table for key-value pairs
-                  html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
+                  html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2 w-[280px]'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
                 }
               });
             }
@@ -112,13 +114,13 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
         Object.entries(data).forEach(([key, value]) => {
           if (Array.isArray(value)) {
             html += `<h3>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h3>`;
-            html += formatJsonData(value, depth + 1, key);
+            html += formatJsonData(value, depth + 1, key, true); // Set hasHeading to true
           } else if (typeof value === "object" && value !== null) {
             html += `<h3>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h3>`;
-            html += formatJsonData(value, depth + 1, key);
+            html += formatJsonData(value, depth + 1, key, true); // Set hasHeading to true
           } else if (!isEmptyValue(value)) {
             // Use table for key-value pairs
-            html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
+            html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2 w-[280px]'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
           }
         });
       }
@@ -194,7 +196,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
             <div></div>
           )}
           <div
-            className={`max-w-[70%] rounded-xl text-sm chatmassage-wrapper ${
+            className={`max-w-[99%] rounded-xl text-sm chatmassage-wrapper ${
               msg.sender === "user"
                 ? "bg-white font-bold border-o3 px-4 py-3 boxshadow rounded-br-none"
                 : msg.isLoading
