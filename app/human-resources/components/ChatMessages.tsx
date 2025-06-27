@@ -19,20 +19,12 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
     if (!arr.length) return false;
     const firstItem = arr[0];
     // Consider it table data if the first item is an object with at least 2 keys
-    // and the data appears structured (e.g., consistent key-value pairs)
+    // or if the key suggests a structured dataset
     return (
       typeof firstItem === "object" &&
-      Object.keys(firstItem).length >= 2 &&
-      Object.values(firstItem).every(
-        (v) => typeof v === "string" || typeof v === "number" || v === null
-      ) &&
-      !["locations", "documents_data"].includes(key.toLowerCase()) // Exclude sparse arrays
+      Object.keys(firstItem).length >= 1 && // Reduced to 1 for broader table use
+      !["locations", "documents_data"].includes(key.toLowerCase()) // Exclude empty-like arrays
     );
-  };
-
-  // Utility function to check if all values in a column are empty
-  const isColumnEmpty = (arr: any[], column: string): boolean => {
-    return arr.every((item) => item[column] === null || item[column] === undefined || item[column] === "");
   };
 
   // Utility function to format a single value
@@ -58,57 +50,43 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
       } else {
         data.forEach((item, index) => {
           if (typeof item === "object" && item !== null) {
-            // Use parentKey as the heading, avoiding duplication
-            const heading = parentKey ? parentKey.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : `Entry ${index + 1}`;
-            if (heading !== "Item") {
-              html += `<h${depth + 3}>${heading}</h${depth + 3}>`;
+            // Use parentKey as the heading, avoid duplication
+            if (parentKey && index === 0) {
+              html += `<h${depth + 3}>${parentKey.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h${depth + 3}>`;
             }
-            html += `<ul>`;
             Object.entries(item).forEach(([key, value]) => {
               if (Array.isArray(value)) {
                 if (isTableData(value, key)) {
-                  // Render as table for structured data
+                  // Render as table for structured arrays
                   const headers = Object.keys(value[0]).filter(
                     (k) => !["id", "_id"].includes(k.toLowerCase())
                   );
-                  // Filter out empty columns
-                  const nonEmptyHeaders = headers.filter((header) => !isColumnEmpty(value, header));
-                  if (nonEmptyHeaders.length > 0) {
-                    html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong>`;
-                    html += `<div class='overflow-x-auto'><table class='border-collapse border border-gray-300 w-full'><thead><tr>`;
-                    nonEmptyHeaders.forEach((header) => {
-                      html += `<th class='border p-2'>${header.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th>`;
+                  html += `<table class='border-collapse border border-gray-300 w-full'><thead><tr>`;
+                  headers.forEach((header) => {
+                    html += `<th class='border p-2'>${header.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th>`;
+                  });
+                  html += `</tr></thead><tbody>`;
+                  value.forEach((row) => {
+                    html += `<tr>`;
+                    headers.forEach((header) => {
+                      html += `<td class='border p-2'>${formatValue(row[header])}</td>`;
                     });
-                    html += `</tr></thead><tbody>`;
-                    value.forEach((row) => {
-                      html += `<tr>`;
-                      nonEmptyHeaders.forEach((header) => {
-                        html += `<td class='border p-2'>${formatValue(row[header])}</td>`;
-                      });
-                      html += `</tr>`;
-                    });
-                    html += `</tbody></table></div></li>`;
-                  } else {
-                    // No valid columns, show minimal message
-                    html += `<li><p>(No valid data available)</p></li>`;
-                  }
+                    html += `</tr>`;
+                  });
+                  html += `</tbody></table>`;
                 } else {
-                  // Render as nested list for non-structured arrays
-                  html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong>`;
-                  html += formatJsonData(value, depth + 1, key);
-                  html += `</li>`;
+                  // Fallback to simple paragraph for non-structured arrays (minimized use)
+                  html += `<p><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</p>`;
                 }
               } else if (typeof value === "object" && value !== null) {
-                html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong>`;
                 html += formatJsonData(value, depth + 1, key);
-                html += `</li>`;
               } else {
-                html += `<li><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</li>`;
+                // Render key-value pairs directly in the table context if possible, else as paragraph
+                html += `<p><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</p>`;
               }
             });
-            html += `</ul>`;
           } else {
-            html += `<li>${formatValue(item)}</li>`;
+            html += `<p>${formatValue(item)}</p>`;
           }
         });
       }
@@ -197,7 +175,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
             <div></div>
           )}
           <div
-            className={`max-w-[99%] rounded-xl text-sm chatmassage-wrapper ${
+            className={`max-w-[70%] rounded-xl text-sm chatmassage-wrapper ${
               msg.sender === "user"
                 ? "bg-white font-bold border-o3 px-4 py-3 boxshadow rounded-br-none"
                 : msg.isLoading
