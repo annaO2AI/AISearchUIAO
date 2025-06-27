@@ -27,13 +27,19 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
     );
   };
 
+  // Utility function to check if a value is empty
+  const isEmptyValue = (value: any): boolean => {
+    return value === null || value === undefined || value === "" || (Array.isArray(value) && value.length === 0);
+  };
+
   // Utility function to format a single value
   const formatValue = (value: any): string => {
-    if (value === null || value === undefined) return "N/A";
+    if (isEmptyValue(value)) return "N/A";
     if (Array.isArray(value)) {
       return formatJsonData(value); // Recursively format arrays
     } else if (typeof value === "object" && value !== null) {
       return Object.entries(value)
+        .filter(([_, v]) => !isEmptyValue(v)) // Filter out empty values
         .map(([k, v]) => `${k.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}: ${formatValue(v)}`)
         .join(", ");
     }
@@ -54,57 +60,69 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
             if (parentKey && index === 0) {
               html += `<h3>${parentKey.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h3>`;
             }
-            Object.entries(item).forEach(([key, value]) => {
-              if (Array.isArray(value)) {
-                if (isTableData(value, key)) {
-                  // Render as table for structured arrays
-                  const headers = Object.keys(value[0]).filter(
-                    (k) => !["id", "_id"].includes(k.toLowerCase())
-                  );
-                  html += `<table class='border-collapse border border-gray-300 w-full'><thead><tr>`;
-                  headers.forEach((header) => {
-                    html += `<th class='border p-2'>${header.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th>`;
-                  });
-                  html += `</tr></thead><tbody>`;
-                  value.forEach((row) => {
-                    html += `<tr>`;
-                    headers.forEach((header) => {
-                      html += `<td class='border p-2'>${formatValue(row[header])}</td>`;
-                    });
-                    html += `</tr>`;
-                  });
-                  html += `</tbody></table>`;
-                } else {
-                  // Fallback to simple paragraph for non-structured arrays
-                  html += `<p><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</p>`;
+            const nonEmptyEntries = Object.entries(item).filter(([_, value]) => !isEmptyValue(value));
+            if (nonEmptyEntries.length > 0) {
+              Object.entries(item).forEach(([key, value]) => {
+                if (Array.isArray(value)) {
+                  if (isTableData(value, key)) {
+                    // Render as table for structured arrays
+                    const headers = Object.keys(value[0]).filter(
+                      (k) => !["id", "_id"].includes(k.toLowerCase()) && !isEmptyValue(value[0][k])
+                    );
+                    if (headers.length > 0) {
+                      html += `<table class='border-collapse border border-gray-300 w-full'><thead><tr>`;
+                      headers.forEach((header) => {
+                        html += `<th class='border p-2'>${header.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th>`;
+                      });
+                      html += `</tr></thead><tbody>`;
+                      value.forEach((row) => {
+                        html += `<tr>`;
+                        headers.forEach((header) => {
+                          if (!isEmptyValue(row[header])) {
+                            html += `<td class='border p-2'>${formatValue(row[header])}</td>`;
+                          }
+                        });
+                        html += `</tr>`;
+                      });
+                      html += `</tbody></table>`;
+                    }
+                  } else {
+                    // Fallback to simple paragraph for non-structured arrays
+                    if (!isEmptyValue(value)) {
+                      html += `<p><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</p>`;
+                    }
+                  }
+                } else if (typeof value === "object" && value !== null) {
+                  html += formatJsonData(value, depth + 1, key);
+                } else if (!isEmptyValue(value)) {
+                  // Use table for key-value pairs
+                  html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
                 }
-              } else if (typeof value === "object" && value !== null) {
-                html += formatJsonData(value, depth + 1, key);
-              } else {
-                // Use table for key-value pairs
-                html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2 w-[280px]'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
-              }
-            });
-          } else {
+              });
+            }
+          } else if (!isEmptyValue(item)) {
             html += `<p>${formatValue(item)}</p>`;
           }
         });
       }
     } else if (typeof data === "object" && data !== null) {
       // Render as paragraphs or nested sections
-      Object.entries(data).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          html += `<h3>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h3>`;
-          html += formatJsonData(value, depth + 1, key);
-        } else if (typeof value === "object" && value !== null) {
-          html += `<h3>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h3>`;
-          html += formatJsonData(value, depth + 1, key);
-        } else {
-          // Use table for key-value pairs
-          html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2 w-[280px]'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
-        }
-      });
-    } else {
+      const nonEmptyEntries = Object.entries(data).filter(([_, value]) => !isEmptyValue(value));
+      if (nonEmptyEntries.length > 0) {
+        Object.entries(data).forEach(([key, value]) => {
+          if (Array.isArray(value)) {
+            html += `<h3>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h3>`;
+            html += formatJsonData(value, depth + 1, key);
+          } else if (typeof value === "object" && value !== null) {
+            html += `<h3>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h3>`;
+            html += formatJsonData(value, depth + 1, key);
+          } else if (!isEmptyValue(value)) {
+            // Use table for key-value pairs
+            html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
+          }
+        });
+      }
+    } else if (!isEmptyValue(data)) {
       html += `<p>${formatValue(data)}</p>`; // Simple text fields
     }
 
@@ -176,7 +194,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
             <div></div>
           )}
           <div
-            className={`max-w-[99%] rounded-xl text-sm chatmassage-wrapper ${
+            className={`max-w-[70%] rounded-xl text-sm chatmassage-wrapper ${
               msg.sender === "user"
                 ? "bg-white font-bold border-o3 px-4 py-3 boxshadow rounded-br-none"
                 : msg.isLoading
