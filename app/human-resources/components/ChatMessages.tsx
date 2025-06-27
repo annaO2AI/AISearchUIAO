@@ -18,12 +18,12 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
   const isTableData = (arr: any[], key: string): boolean => {
     if (!arr.length) return false;
     const firstItem = arr[0];
-    // Consider it table data if the first item is an object with at least 2 keys
-    // or if the key suggests a structured dataset
+    // Consider it table data if the first item is an object with at least 1 key
+    // and exclude empty-like arrays
     return (
       typeof firstItem === "object" &&
-      Object.keys(firstItem).length >= 1 && // Reduced to 1 for broader table use
-      !["locations", "documents_data"].includes(key.toLowerCase()) // Exclude empty-like arrays
+      Object.keys(firstItem).length >= 1 &&
+      !["locations", "documents_data"].includes(key.toLowerCase())
     );
   };
 
@@ -50,9 +50,9 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
       } else {
         data.forEach((item, index) => {
           if (typeof item === "object" && item !== null) {
-            // Use parentKey as the heading, avoid duplication
+            // Use parentKey as the heading with <h3>
             if (parentKey && index === 0) {
-              html += `<h${depth + 3}>${parentKey.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h${depth + 3}>`;
+              html += `<h3>${parentKey.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h3>`;
             }
             Object.entries(item).forEach(([key, value]) => {
               if (Array.isArray(value)) {
@@ -75,14 +75,14 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
                   });
                   html += `</tbody></table>`;
                 } else {
-                  // Fallback to simple paragraph for non-structured arrays (minimized use)
+                  // Fallback to simple paragraph for non-structured arrays
                   html += `<p><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</p>`;
                 }
               } else if (typeof value === "object" && value !== null) {
                 html += formatJsonData(value, depth + 1, key);
               } else {
-                // Render key-value pairs directly in the table context if possible, else as paragraph
-                html += `<p><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</p>`;
+                // Use table for key-value pairs
+                html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
               }
             });
           } else {
@@ -94,17 +94,18 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
       // Render as paragraphs or nested sections
       Object.entries(data).forEach(([key, value]) => {
         if (Array.isArray(value)) {
-          html += `<h${depth + 3}>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h${depth + 3}>`;
+          html += `<h3>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h3>`;
           html += formatJsonData(value, depth + 1, key);
         } else if (typeof value === "object" && value !== null) {
-          html += `<h${depth + 3}>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h${depth + 3}>`;
+          html += `<h3>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</h3>`;
           html += formatJsonData(value, depth + 1, key);
         } else {
-          html += `<p><strong>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> ${formatValue(value)}</p>`;
+          // Use table for key-value pairs
+          html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
         }
       });
     } else {
-      html += `<p>${formatValue(data)}</p>`;
+      html += `<p>${formatValue(data)}</p>`; // Simple text fields
     }
 
     return html;
@@ -131,7 +132,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
             inList = false;
             return "</ul>" + (line ? `<br />${line}` : "");
           }
-          return line ? `${line}` : "";
+          return line ? `<p>${line}</p>` : "";
         }
       });
       if (inList) {
