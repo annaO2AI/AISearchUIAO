@@ -43,7 +43,10 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
     documents?: Document[],
     recommendation?: string
   ) => {
-    let formattedContent = content
+    // Remove the backend message field (e.g., "Found 19 documents for Postman") from content
+    let cleanedContent = content.replace(/Found \d+ documents for [^\.]+/, "").trim();
+
+    let formattedContent = cleanedContent
       .replace(/\*\*([^\*]+)\*\*/g, "<strong>$1</strong>")
       .replace(/\n/g, "<br />");
 

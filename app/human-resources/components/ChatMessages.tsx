@@ -63,7 +63,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
                   );
                   html += `<table class='border-collapse border border-gray-300 w-full'><thead><tr>`;
                   headers.forEach((header) => {
-                    html += `<th class='border p-2 w-[250px]'>${header.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th>`;
+                    html += `<th class='border p-2'>${header.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th>`;
                   });
                   html += `</tr></thead><tbody>`;
                   value.forEach((row) => {
@@ -82,7 +82,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
                 html += formatJsonData(value, depth + 1, key);
               } else {
                 // Use table for key-value pairs
-                html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
+                html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2 w-[280px]'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
               }
             });
           } else {
@@ -101,7 +101,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
           html += formatJsonData(value, depth + 1, key);
         } else {
           // Use table for key-value pairs
-          html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
+          html += `<table class='border-collapse border border-gray-300 w-full'><tbody><tr><th class='border p-2 w-[280px]'>${key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</th><td class='border p-2'>${formatValue(value)}</td></tr></tbody></table>`;
         }
       });
     } else {
