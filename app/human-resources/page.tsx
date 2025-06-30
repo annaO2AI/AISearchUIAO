@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "../components/dashboard/Sidebar";
 import { DashboardProvider } from "../context/DashboardContext";
-import HumanResources from "./components/human-resources"; // Import TalentAcquisition directly
+import HumanResources from "./components/human-resources"; // 
+import HeaderAISearch from "../chat-ui/components/Header";
+import Breadcrumbs from "../components/dashboard/Breadcrumbs"; // Import Breadcrumbs component
 
 export default function TalentAcquisitionPage() {
   const pathname = usePathname();
@@ -39,10 +41,13 @@ export default function TalentAcquisitionPage() {
             setHovered={setHovered}
           />
         )}
+        <HeaderAISearch sidebarOpen={showSidebar && isSidebarExpanded} />
+        <Breadcrumbs sidebarOpen={showSidebar && isSidebarExpanded} />
         <div
           className="flex flex-col flex-1 transition-all duration-300 ease-in-out"
           style={{ marginLeft: showSidebar ? sidebarWidth : 0 }}
         >
+          
           <main>
             <HumanResources onSend={() => console.log("Message sent")} />
           </main>

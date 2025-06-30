@@ -37,7 +37,7 @@ export default function LayoutWrapper({ children }: { children: ReactNode }) {
   const sidebarWidth = isSidebarExpanded ? 256 : 64;
 
   // Show sidebar only on the homepage
-  const showSidebar = pathname === "/";
+  const showSidebar = pathname === "/" || pathname === "/talent-acquisition" || pathname === "/human-resources" || pathname === "/aiops" ;
 
   return (
     <DashboardProvider>
@@ -58,7 +58,7 @@ export default function LayoutWrapper({ children }: { children: ReactNode }) {
             <HeaderAISearch sidebarOpen={showSidebar && isSidebarExpanded} />
             {/* <Popupprofile /> */}
             <PopupComponent />
-            <Breadcrumbs />
+            {/* <Breadcrumbs sidebarOpen={showSidebar && isSidebarExpanded} /> */}
           </>
           <main
             className={clsx("flex-1 overflow-auto p-2 background-chat-ui", {

@@ -55,9 +55,9 @@ export default function HeaderAISearch({ sidebarOpen }: HeaderProps) {
               ? "shadow-md border-b border-white/30"
               : "border-b border-white/10",
             sidebarOpen
-              ? " w-[calc(100%-16rem)]"
-              : pathname === "/"
-              ? " w-[calc(100%-4rem)]"
+              ? "pl-[240px]"
+              : pathname === "/" || pathname === "/aiops" || pathname === "/talent-acquisition" || pathname === "/human-resources"
+              ? "pl-[0]"
               : "w-full"
           )}
         >

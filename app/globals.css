@@ -199,7 +199,10 @@ body {
     position: absolute;
     left: 0;
     right: 0;
+    top: 0;
     background-color: #fafafa;
+     transition: all 0.3s ease-in-out;
+
   }
   .chatmassage-wrapper h3{
     font-weight: bold;

@@ -5,12 +5,14 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HomeIcon, HrIcon, AiIcon, ArroTabIcon,Rightarrow, Leftarrow } from "../../chat-ui/components/icons"; // Import icons used in Sidebar
+import clsx from "clsx"
+type HeaderProps = {
+  sidebarOpen: boolean
+}
 
-
-const Breadcrumbs = () => {
+export default function Breadcrumbs({ sidebarOpen }: HeaderProps) {
   const pathname = usePathname();
   const [breadcrumbs, setBreadcrumbs] = useState<{ label: string; href: string; icon?: any }[]>([]);
-
   useEffect(() => {
     const pathSegments = pathname.split("/").filter((segment) => segment);
     const breadcrumbItems = pathSegments.map((segment, index) => {
@@ -37,8 +39,16 @@ const Breadcrumbs = () => {
   }, [pathname]);
 
   return (
-    <div className="header-widthfix mt-12 mx-auto bradcurame-section">
-      <nav className="flex py-2 px-4 mt-8 w-[80rem]">
+    <div className={clsx(
+                "header-widthfix w-full mt-12 mx-auto bradcurame-section", 
+                sidebarOpen
+                  ? "pl-[280px]"
+                  : pathname === "/" || pathname === "/aiops" || pathname === "/talent-acquisition" || pathname === "/human-resources"
+                  ? "pl-[80px]"
+                  : "w-full"
+              )}
+    >
+      <nav className="flex py-2 px-4 mt-8 w-[100%]">
         {breadcrumbs.map((crumb, index) => (
           <div key={crumb.href} className="flex items-center text-sm">
             <Link href={crumb.href} className="text-blue-600">
@@ -57,5 +67,3 @@ const Breadcrumbs = () => {
     </div>
   );
 };
-
-export default Breadcrumbs;
