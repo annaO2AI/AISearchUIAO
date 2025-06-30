@@ -222,7 +222,7 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
           </div>
           <div className="text-base bottom-0 sticky">
             <div
-              className={`flex flex-col w-full max-w-6xl px-4 p-2 rounded-xl bg-white border-o2 aisearchinput ${
+              className={`flex flex-col w-full w-[100%] px-4 p-2 rounded-xl bg-white border-o2 aisearchinput ${
                 isInputFocused ? "aisearchinput-focused" : ""
               }`}
             >

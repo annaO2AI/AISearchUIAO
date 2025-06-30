@@ -37,7 +37,7 @@ const Breadcrumbs = () => {
   }, [pathname]);
 
   return (
-    <div className="max-w-7xl mt-12 mx-auto bradcurame-section">
+    <div className="header-widthfix mt-12 mx-auto bradcurame-section">
       <nav className="flex py-2 px-4 mt-8 w-[80rem]">
         {breadcrumbs.map((crumb, index) => (
           <div key={crumb.href} className="flex items-center text-sm">

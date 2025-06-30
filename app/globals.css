@@ -10,7 +10,7 @@ body {
 
 /* ✅ Custom utilities using @layer if needed */
 @layer utilities {
-  .backround-chat-ui{
+  .background-chat-ui{
     background-image: url(../public/bg-otwobg.png); 
     background-size:cover ;
     background-color: #F4F8FB;
@@ -41,9 +41,12 @@ body {
     height: calc(100vh - 150px);
     margin: auto;
     align-content: center;
-    width: 60%;
+    width: 70%;
     margin-top: 110px;
     transition: all 0.9s ease-in-out;
+  }
+  .header-widthfix{
+    width: 70%
   }
   .o2AlignSearchm1-center{
     align-content: flex-end;
@@ -79,7 +82,7 @@ body {
     line-break: anywhere;
   }
   .minarea-max-hright{
-    height: calc(100vh - 90px);
+    height: calc(100vh - 153px);
     overflow-y: scroll;
     overscroll-behavior: contain;
     transition: all 0.9s ease-in-out;
@@ -87,7 +90,7 @@ body {
   }
 
   .minarea-max-hright-aiops{
-        height: calc(100vh - 159px);
+    height: calc(100vh - 202px);
     overflow-y: scroll;
     overscroll-behavior: contain;
     transition: all 0.9s ease-in-out;

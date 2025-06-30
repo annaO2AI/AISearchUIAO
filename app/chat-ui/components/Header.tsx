@@ -61,7 +61,7 @@ export default function HeaderAISearch({ sidebarOpen }: HeaderProps) {
               : "w-full"
           )}
         >
-      <div className="w-full max-w-7xl mx-auto px-4 flex items-center justify-between">
+      <div className="w-full header-widthfix mx-auto px-4 flex items-center justify-between">
           <div>
             <Image
             src="/Otow-log.svg"

@@ -7,7 +7,7 @@ import clsx from "clsx";
 import { useState } from "react";
 import { Rightarrow, Leftarrow, HrIcon, ArroTabIcon, LegalSearchIcon, AiIcon, AiOps } from "../../chat-ui/components/icons";
 
-// Define navigation items
+// Define navigation items (unused, kept for reference)
 const navItems = [
   { label: "Home", icon: HomeIcon, href: "#" },
   { label: "Reports", icon: BarChart2Icon, href: "#" },
@@ -16,7 +16,7 @@ const navItems = [
 
 // Define menu items for dropdowns
 const menuItems = [
-   {
+  {
     id: "aiSearch",
     label: "AI Search",
     icon: AiIcon,
@@ -57,6 +57,14 @@ export default function Sidebar({
 
   const toggleMenu = (menuId: string) => {
     setOpenMenu(openMenu === menuId ? null : menuId);
+    // No toggleSidebar call here to prevent collapsing on main menu click
+  };
+
+  const handleSubItemClick = () => {
+    // Collapse sidebar only if it's expanded
+    if (isExpanded) {
+      toggleSidebar();
+    }
   };
 
   return (
@@ -119,6 +127,7 @@ export default function Sidebar({
                 <a
                   key={subItem.label}
                   href={subItem.href}
+                  onClick={handleSubItemClick}
                   className="flex block px-4 py-4 hover:bg-gray-200 gap-3 bg-gray-100 min-w-[20px]"
                 >
                   {isExpanded ? (
@@ -134,8 +143,11 @@ export default function Sidebar({
           </div>
         ))}
         {/* Static Menu Item */}
-        <a href="/aiops"
-          className="px-4 py-5 flex items-center hover:bg-gray-200 transition-colors gap-3 min-w-[20px]" >
+        <a
+          href="/aiops"
+          onClick={handleSubItemClick}
+          className="px-4 py-5 flex items-center hover:bg-gray-200 transition-colors gap-3 min-w-[20px]"
+        >
           {isExpanded ? (
             <>
               <AiOps width={20} /> AIOps
