@@ -50,7 +50,7 @@ export default function HeaderAISearch({ sidebarOpen }: HeaderProps) {
     <header
           className={clsx(
             "w-full fixed top-0 z-10 transition-all duration-300 h-18 flex items-center custome-header-shadow",
-            "backdrop-blur-xl supports-[backdrop-filter]:bg-white/60",
+            "backdrop-blur-xl supports-[backdrop-filter]:bg-white",
             scrolled
               ? "shadow-md border-b border-white/30"
               : "border-b border-white/10",
