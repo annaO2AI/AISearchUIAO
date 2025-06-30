@@ -104,7 +104,13 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
       `;
     }
 
-    if (recommendation) {
+    // Only include recommendation if documents array is not empty
+    if (
+      recommendation &&
+      documents &&
+      Array.isArray(documents) &&
+      documents.length > 0
+    ) {
       formattedContent += `<br /><strong>Recommendation:</strong><br />`;
 
       // Split recommendation into lines
