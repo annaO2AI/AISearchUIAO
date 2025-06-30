@@ -50,12 +50,13 @@ export default function LayoutWrapper({ children }: { children: ReactNode }) {
             setHovered={setHovered}
           />
         )}
+         <HeaderAISearch sidebarOpen={showSidebar && isSidebarExpanded} />
         <div
           className="flex flex-col flex-1 transition-all duration-300 ease-in-out"
           style={{ marginLeft: showSidebar ? sidebarWidth : 0 }}
         >
           <>
-            <HeaderAISearch sidebarOpen={showSidebar && isSidebarExpanded} />
+           
             {/* <Popupprofile /> */}
             <PopupComponent />
             {/* <Breadcrumbs sidebarOpen={showSidebar && isSidebarExpanded} /> */}
