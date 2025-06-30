@@ -163,7 +163,7 @@ export default function HumanResources({ onSend }: { onSend: () => void }) {
             : "o2AlignSearch-center o2AlignSearchm1-center"
         }
       >
-        <div className="flex flex-col gap-3 text-left mt-auto text-xs subtitle w-full max-w-7xl">
+        <div className="flex flex-col gap-3 text-left mt-auto text-xs subtitle w-full max-w-7xl m-auto">
           {messages.length === 0 && <WelcomeMessage username={username} />}
           <div className="flex flex-col h-full">
             <ChatMessages messages={messages} initials={initials} />
