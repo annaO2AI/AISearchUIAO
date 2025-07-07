@@ -22,7 +22,7 @@ const menuItems = [
     icon: AiIcon,
     subItems: [
       { label: "Talent Acquisition", href: "/talent-acquisition", icon: ArroTabIcon },
-      { label: "Procurement Search", href: "/", icon: ArroTabIcon },
+      { label: "Procurement Search", href: "/procurement-search", icon: ArroTabIcon },
       { label: "Finance Search", href: "/", icon: ArroTabIcon },
       { label: "Legal Search", href: "/", icon: ArroTabIcon },
     ],
