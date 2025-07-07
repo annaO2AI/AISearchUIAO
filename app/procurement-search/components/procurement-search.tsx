@@ -17,10 +17,14 @@ import FollowUpQuestions from "./FollowUpQuestions";
 import WelcomeMessage from "./WelcomeMessage"; // Import the new component
 import ChatMessages from "./ChatMessages";
 
+interface FileData {
+  file: File;
+  name: string;
+  type: string;
+}
+
 export default function Aisearch({ onSend }: { onSend: () => void }) {
-  const [fileName, setFileName] = useState("");
-  const [fileType, setFileType] = useState("");
-  const [fileInput, setFileInput] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<FileData[]>([]);
   const [username, setUsername] = useState<string | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -98,8 +102,9 @@ useEffect(() => {
   }
 }, [messages, isLoading]); // Added isLoading to dependencies
 
+// This function handles sending the user's query and selected files to the backend
   const sendMessage = async () => {
-    if (!query?.trim() && !fileInput) return;
+    if (!query?.trim() && selectedFiles.length === 0) return;
 
     setIsLoading(true);
 
@@ -112,9 +117,14 @@ useEffect(() => {
     setQuery("");
 
     try {
-      if (fileName && fileInput) {
+      // Upload multiple files if any are selected
+      if (selectedFiles.length > 0) {
         const formData = new FormData();
-        formData.append("file", fileInput);
+        
+        // Add all selected files to FormData
+        selectedFiles.forEach((fileData, index) => {
+          formData.append(`files`, fileData.file);
+        });
 
         const uploadRes = await fetchWithAuth(API_ROUTES.upload, {
           method: "POST",
@@ -123,24 +133,22 @@ useEffect(() => {
 
         if (!uploadRes.ok) throw new Error("File upload failed");
 
-        if (fileInput) {
+        selectedFiles.forEach((fileData) => {
           setMessages((prev) =>
             prev.filter((msg) => !msg.isLoading).concat([
               {
                 sender: "user",
-                content: `📎 ${fileName}`,
-                fileType: fileType,
+                content: `📎 ${fileData.name}`,
+                fileType: fileData.type,
               },
             ])
           );
-        }
+        });
       }
 
-      if (!query.trim() && !fileInput) {
+      if (!query.trim() && selectedFiles.length === 0) {
         setIsLoading(false);
-        setFileName("");
-        setFileType("");
-        setFileInput(null);
+        setSelectedFiles([]);
         setMessages((prev) => prev.filter((msg) => !msg.isLoading));
         return;
       }
@@ -151,6 +159,10 @@ useEffect(() => {
         body: JSON.stringify({
           conversationId,
           query: query,
+          files: selectedFiles.map(f => ({
+            name: f.name,
+            type: f.type
+          }))
         }),
       });
 
@@ -176,9 +188,7 @@ useEffect(() => {
       );
     }
 
-    setFileName("");
-    setFileType("");
-    setFileInput(null);
+    setSelectedFiles([]);
     setIsLoading(false);
 
     if (inputRef.current && !isLoading) {
@@ -186,13 +196,18 @@ useEffect(() => {
     }
   };
 
+  // This function handles file selection and updates the selectedFiles state
   const handleFileChange = (e: any) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFileInput(file);
-      setFileName(file.name);
-      const extension = file.name.split(".").pop().toLowerCase();
-      setFileType(extension);
+    const files = Array.from(e.target.files) as File[];
+    
+    if (files.length > 0) {
+      const newFiles: FileData[] = files.map(file => ({
+        file,
+        name: file.name,
+        type: file.name.split(".").pop()?.toLowerCase() || ""
+      }));
+      
+      setSelectedFiles(prev => [...prev, ...newFiles]);
     }
   };
 
@@ -202,6 +217,8 @@ useEffect(() => {
     }
   }, []);
 
+  // Function to get initials from the username
+  // This function extracts the first letter of the first and last name
   function getInitials(name: string | null): string {
     if (!name) return "";
     const parts = name.split(" ");
@@ -247,18 +264,21 @@ useEffect(() => {
                 isInputFocused ? "aisearchinput-focused" : ""
               }`}
             >
-              {fileName && (
-                <div className="flex flex-row mb-4">
-                  <div className="flex flex-row items-center rounded-md border border-solid border-gray-200 p-4 bg-white gap-4">
-                    {fileType === "doc" || fileType === "docx" ? (
-                      <DOCIcon width={26} />
-                    ) : null}
-                    {fileType === "pdf" ? <PDFIcon width={24} /> : null}
-                    {fileName && (
-                      <p className="text-sm text-gray-600">{fileName}</p>
-                    )}
+              {selectedFiles.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedFiles.map((fileData, index) => (
+                      <div
+                        key={index}
+                        className="flex flex-row items-center rounded-md border border-solid border-gray-200 p-3 bg-white gap-3 relative"
+                      >
+                        {fileData.type === "doc" || fileData.type === "docx" ? (
+                          <DOCIcon width={26} />
+                        ) : null}
+                        {fileData.type === "pdf" ? <PDFIcon width={24} /> : null}
+                        <p className="text-sm text-gray-600">{fileData.name}</p>
+                      </div>
+                    ))}
                   </div>
-                </div>
               )}
               <div className="flex-1 text-gray-400 flex items-center space-x-2 mb-2">
                 <AIsearchIcon width={36} />
