@@ -1,5 +1,5 @@
 "use client";
-import { LoganimationsIcon } from "../components/icons";
+import { LoganimationsIcon } from "./icons";
 import Image from 'next/image';
 
 interface WelcomeMessageProps {
@@ -23,13 +23,13 @@ export default function WelcomeMessage({ username }: WelcomeMessageProps) {
         </p>
       </div>
       <div className="images-ill">
-                    <Image 
-                          src="/hr-ill.gif" 
-                          alt="I Search" 
-                          width={280} 
-                          height={280} 
-                          className="imagfilter"
-                      />
+        <Image
+          src="/hr-ill.gif"
+          alt="I Search"
+          width={280}
+          height={280}
+          className="imagfilter"
+        />
       </div>
     </div>
   );

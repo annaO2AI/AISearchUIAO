@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import TalentAcquisition from "./procurement-search"
+import TalentAcquisition from "./talent-acquisition"
 
 
 export default function Layout() {

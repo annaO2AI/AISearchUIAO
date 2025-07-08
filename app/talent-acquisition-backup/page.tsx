@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "../components/dashboard/Sidebar";
 import { DashboardProvider } from "../context/DashboardContext";
-import TalentAcquisition from "./components/procurement-search"; // Import TalentAcquisition directly
+import TalentAcquisition from "./components/talent-acquisition"; // Import TalentAcquisition directly
 // import HeaderAISearch from "../components/dashboard/HeaderAISearch";
 import HeaderAISearch from "../chat-ui/components/Header";
 import Breadcrumbs from "../components/dashboard/Breadcrumbs"; // Import Breadcrumbs component
@@ -29,7 +29,7 @@ export default function TalentAcquisitionPage() {
   const sidebarWidth = isSidebarExpanded ? 256 : 64;
 
   // Show sidebar on the talent-acquisition page
-   const showSidebar =  pathname === "/procurement-search" ;
+   const showSidebar =  pathname === "/talent-acquisition" ;
 
   return (
     <DashboardProvider>
