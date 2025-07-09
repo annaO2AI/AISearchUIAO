@@ -2,12 +2,12 @@
 import { useEffect, useState, useRef } from "react";
 import {
   LoganimationsIcon,
-   SendIcon,
-   AttachemntIcon,
-   AIsearchIcon,
-   DOCIcon,
-   PDFIcon,
-   LogIcon
+  SendIcon,
+  AttachemntIcon,
+  AIsearchIcon,
+  DOCIcon,
+  PDFIcon,
+  LogIcon
 } from "./icons";
 import { useAISearch } from "../../context/AISearchContext";
 import { fetchWithAuth } from "@/app/utils/axios";
@@ -64,7 +64,6 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
         });
         const data = await res.json();
         if (data?.conversation_id) {
-          console.log(data.conversation_id);
           setConversationId(data?.conversation_id);
         }
       } catch (err) {
@@ -76,30 +75,38 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
   }, [setConversationId]);
 
   function extractLastResponse(response: string): string {
-    // Check if the response has numbered items pattern
-    if (response.match(/\d+\s[^0-9]+/)) {
-      // Split by numbers followed by space
-      const matches = response.match(/(\d+\s[^0-9]+)/g)
-      if (matches) {
-        // Join with proper line breaks between each numbered item
-        return matches.map((item) => item.trim()).join("\n")
-      }
+    if (!response?.trim()) return response;
+
+    // Check if response contains numbered items (1. 2. 3. etc)
+    const numberedItems = response.match(/^\d+\.\s+.+/gm);
+    if (numberedItems && numberedItems.length > 0) {
+      return numberedItems.join('\n');
     }
-    return response
+
+    // Check for markdown-style numbered items (### 1. etc)
+    const markdownNumbered = response.match(/###\s+\d+\.\s+.+/g);
+    if (markdownNumbered && markdownNumbered.length > 0) {
+      return markdownNumbered.map(item => 
+        item.replace(/^###\s+/, '')
+      ).join('\n');
+    }
+
+    // Return full response if no patterns matched
+    return response;
   }
 
-useEffect(() => {
-  if (chatContainerRef.current) {
-    setTimeout(() => {
-      chatContainerRef.current!.scrollTo({
-        top: chatContainerRef.current!.scrollHeight,
-        behavior: "smooth",
-      });
-    }, 0);
-  }
-  if (inputRef.current && !isLoading) {
-    inputRef.current.focus();
-  }
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      setTimeout(() => {
+        chatContainerRef.current!.scrollTo({
+          top: chatContainerRef.current!.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 0);
+    }
+    if (inputRef.current && !isLoading) {
+      inputRef.current.focus();
+    }
 }, [messages, isLoading]); // Added isLoading to dependencies
 
 // This function handles sending the user's query and selected files to the backend
@@ -137,9 +144,9 @@ useEffect(() => {
           setMessages((prev) =>
             prev.filter((msg) => !msg.isLoading).concat([
               {
-                sender: "user",
-                content: `📎 ${fileData.name}`,
-                fileType: fileData.type,
+              sender: "user",
+              content: `📎 ${fileData.name}`,
+              fileType: fileData.type,
               },
             ])
           );
@@ -168,13 +175,13 @@ useEffect(() => {
 
       const data = await res.json();
       const extracted = extractLastResponse(data?.response || "")
-
+      
       setMessages((prev) =>
         prev.filter((msg) => !msg.isLoading).concat([
           {
-            sender: "ai",
+          sender: "ai",
            content: extracted || data.response,
-            followup_questions: data.followup_questions || [],
+          followup_questions: data.followup_questions || [],
           },
         ])
       );
@@ -188,11 +195,11 @@ useEffect(() => {
       );
     }
 
-    setSelectedFiles([]);
-    setIsLoading(false);
+      setSelectedFiles([]);
+      setIsLoading(false);
 
     if (inputRef.current && !isLoading) {
-      inputRef.current.focus();
+        inputRef.current.focus();
     }
   };
 
@@ -247,7 +254,7 @@ useEffect(() => {
         <div className="flex flex-col gap-3 text-left mt-auto text-xs subtitle w-full max-w-7xl m-auto">
           {messages.length === 0 && <WelcomeMessage username={username} />}
           <div className="flex flex-col h-full">
-          <ChatMessages messages={messages} initials={initials} />
+            <ChatMessages messages={messages} initials={initials} />
             {latestAIMessage && (
               <FollowUpQuestions
                 followupQuestions={latestAIMessage.followup_questions || []}
@@ -261,24 +268,24 @@ useEffect(() => {
           <div className="text-base bottom-0 sticky">
             <div
               className={`flex flex-col w-full w-[100%] px-4 p-2 rounded-xl bg-white border-o2 aisearchinput ${
-                isInputFocused ? "aisearchinput-focused" : ""
+              isInputFocused ? "aisearchinput-focused" : ""
               }`}
             >
               {selectedFiles.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {selectedFiles.map((fileData, index) => (
-                      <div
-                        key={index}
-                        className="flex flex-row items-center rounded-md border border-solid border-gray-200 p-3 bg-white gap-3 relative"
-                      >
-                        {fileData.type === "doc" || fileData.type === "docx" ? (
-                          <DOCIcon width={26} />
-                        ) : null}
-                        {fileData.type === "pdf" ? <PDFIcon width={24} /> : null}
-                        <p className="text-sm text-gray-600">{fileData.name}</p>
-                      </div>
-                    ))}
-                  </div>
+                <div className="flex flex-wrap gap-2">
+                  {selectedFiles.map((fileData, index) => (
+                    <div
+                      key={index}
+                      className="flex flex-row items-center rounded-md border border-solid border-gray-200 p-3 bg-white gap-3 relative"
+                    >
+                      {fileData.type === "doc" || fileData.type === "docx" ? (
+                        <DOCIcon width={26} />
+                      ) : null}
+                      {fileData.type === "pdf" ? <PDFIcon width={24} /> : null}
+                      <p className="text-sm text-gray-600">{fileData.name}</p>
+                    </div>
+                  ))}
+                </div>
               )}
               <div className="flex-1 text-gray-400 flex items-center space-x-2 mb-2">
                 <AIsearchIcon width={36} />
