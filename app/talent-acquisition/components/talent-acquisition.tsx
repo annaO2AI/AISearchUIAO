@@ -180,7 +180,7 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
         prev.filter((msg) => !msg.isLoading).concat([
           {
           sender: "ai",
-           content: extracted || data.response,
+           content: data?.response || "",
           followup_questions: data.followup_questions || [],
           },
         ])
