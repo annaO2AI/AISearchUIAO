@@ -51,6 +51,7 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isInputFocused, setIsInputFocused] = useState(false);
  const [isSkipped, setIsSkipped] = useState(false);
+ const [uploadFileCount, setUploadFileCount] = useState(0);
  
   const {
     query,
@@ -131,6 +132,168 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
     }
 }, [messages, isLoading]); // Added isLoading to dependencies
 
+
+// Function to handle file upload progress
+const uploadFile = async (file: FileData[], sessionId:string, id:number) => {
+  const formData = new FormData();
+    // Create a new AbortController for this request
+  abortControllerRef.current = new AbortController();
+  try{
+     file.forEach((fileData) => {
+          formData.append(`file`, fileData.file);
+        });
+        formData.append(`session_id`, sessionId);
+         const uploadRes = await fetchWithAuth(API_ROUTES.upload, {
+          method: "POST",
+          body: formData,
+          signal: abortControllerRef.current.signal,
+        });
+
+        if (!uploadRes.ok) throw new Error("File upload failed");
+        setUploadFileCount(id)
+  }catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      setSelectedFiles([]);
+      setIsLoading(false);
+      setMessages((prev) =>
+          prev.filter((msg) => !msg.isLoading).concat([
+            { sender: "ai", content: "The request was aborted." },
+          ]))
+      }
+  }
+}
+
+
+// function to fetch ask api information
+const fetchAskApi = async () => {
+   // Create a new AbortController for this request
+  abortControllerRef.current = new AbortController();
+try{
+      const res = await fetchWithAuth(API_ROUTES.ask, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversationId,
+          query: query,
+        }),
+         signal: abortControllerRef.current.signal,
+      });
+
+      const data = await res.json();
+     return data
+  }catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      setSelectedFiles([]);
+   setIsLoading(false);
+   setMessages((prev) =>
+          prev.filter((msg) => !msg.isLoading).concat([
+            { sender: "ai", content: "The request was aborted." },
+          ]))
+
+
+    }
+}}
+
+//handle multiple file uploads
+  const handleMultipleUpload = async () => {
+     // Create a new AbortController for this request
+  abortControllerRef.current = new AbortController();
+  if (!query?.trim() && selectedFiles.length === 0) return;
+setIsLoading(true);
+  if (query?.trim()) {
+ setMessages((prev) => [...prev, { sender: "user", content: query }]);
+}
+
+setMessages((prev) => [...prev, { sender: "ai", content: "Thinking...", isLoading: true }]);
+
+setQuery("");
+    try{    
+    if (selectedFiles.length === 0) {
+  const data = await fetchAskApi();
+  if(data){
+    setMessages((prev) =>
+        prev.filter((msg) => !msg.isLoading).concat([
+          {
+          sender: "ai",
+           content: data?.response || "",
+          followup_questions: data.followup_questions || [],
+          },
+        ]))
+        setConversationHistory(data?.conversation_history);
+      
+  }
+    }else{
+       const sessionId = generateSessionToken();
+  
+    for (let i = 0; i < selectedFiles.length; i++) {
+      // Check if the request was aborted before uploading the next file
+      if (abortControllerRef.current?.signal.aborted) {
+        break;
+      }
+    await uploadFile([selectedFiles[i]], sessionId, i + 1);
+  }
+     selectedFiles.forEach((fileData) => {
+          setMessages((prev) =>
+            prev.filter((msg) => !msg.isLoading).concat([
+              {
+              sender: "user",
+              content: `📎 ${fileData.name}`,
+              fileType: fileData.type,
+              },
+            ])
+          );
+        });
+
+         if (!query.trim() && selectedFiles.length === 0) {
+        setIsLoading(false);
+        setSelectedFiles([]);
+        setMessages((prev) => prev.filter((msg) => !msg.isLoading));
+        return;
+      }
+  // After all uploads are done, call the next API here  
+  if (abortControllerRef.current?.signal.aborted) {
+    setIsLoading(false);
+    setMessages((prev) =>
+      prev.filter((msg) => !msg.isLoading).concat([
+        { sender: "ai", content: "The request was aborted." },
+      ])
+    );
+    return;
+  }
+  const data = await fetchAskApi();
+  if(data){
+    setMessages((prev) =>
+        prev.filter((msg) => !msg.isLoading).concat([
+          {
+          sender: "ai",
+           content: data?.response || "",
+          followup_questions: data.followup_questions || [],
+          },
+        ]))
+        setConversationHistory(data?.conversation_history);
+      
+  }
+}
+setSelectedFiles([]);
+   setIsLoading(false);
+
+ if (inputRef.current && !isLoading) {
+     inputRef.current.focus();
+ }
+   
+ 
+  }catch(error) {
+    }
+    finally{
+      setSelectedFiles([]);
+   setIsLoading(false);
+
+ if (inputRef.current && !isLoading) {
+     inputRef.current.focus();
+ }
+    }
+  }
+
 // This function handles sending the user's query and selected files to the backend
   const sendMessage = async () => {
     if (!query?.trim() && selectedFiles.length === 0) return;
@@ -204,9 +367,8 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
 
       const data = await res.json();
       const extracted = extractLastResponse(data?.response || "")
-      console.log(isSkipped, "isLoading state in sendMessage");
       
-        if(!isSkipped) {
+       
           setMessages((prev) =>
         prev.filter((msg) => !msg.isLoading).concat([
           {
@@ -216,13 +378,9 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
           },
         ])
       );     
-    } else {
-      // If skipped, just remove the loading message
-      setMessages((prev) => prev.filter((msg) => !msg.isLoading));
-    }
+   
       setConversationHistory(data?.conversation_history);
     } catch (err) {
-      console.error("Error during ask:", err);
      if( err instanceof Error && err.name === "AbortError") {
          setMessages((prev) =>
           prev.filter((msg) => !msg.isLoading).concat([
@@ -376,7 +534,10 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
                 </div>
                 <button
                   disabled={isLoading}
-                  onClick={sendMessage}
+                  onClick={() => {
+                     abortControllerRef.current = null;
+                     handleMultipleUpload()}}
+                  // onClick={sendMessage}
                   className={`bg-gradient-to-r from-indigo-500 to-blue-500 text-white p-6 py-2 rounded-full flex items-center gap-1 text-sm cursor-pointer ${
                     isLoading ? "opacity-50 cursor-not-allowed" : ""
                   }`}
