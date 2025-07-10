@@ -27,9 +27,9 @@ export const API_ROUTES = {
   // useaccess: `${API_BASE_URL}/get-user-role`,
 
   //AI Search api's
-  upload: `${API_BASE_URL_AISEARCH}upload`,
+  upload: `${API_BASE_URL_AISEARCH}/upload`,
   conversations: `${API_BASE_URL_AISEARCH}/conversations`,
-  ask: `${API_BASE_URL_AISEARCH}ask`,
+  ask: `${API_BASE_URL_AISEARCH}/ask`,
   deleteConversation: (conversation_id: string) =>
     `${API_BASE_URL_AISEARCH}/conversations/${conversation_id}`,
 
