@@ -23,13 +23,35 @@ interface FileData {
   type: string;
 }
 
+function generateSessionToken(): string {
+  const now = new Date();
+  // Format: YYYYMMDD-HHMMSS-milliseconds-random
+  const pad = (n: number, len = 2) => n.toString().padStart(len, "0");
+  const datePart = [
+    now.getFullYear(),
+    pad(now.getMonth() + 1),
+    pad(now.getDate())
+  ].join("");
+  const timePart = [
+    pad(now.getHours()),
+    pad(now.getMinutes()),
+    pad(now.getSeconds())
+  ].join("");
+  const msPart = pad(now.getMilliseconds(), 3);
+  const randPart = Math.random().toString(36).slice(2, 8);
+  return `${datePart}-${timePart}-${msPart}-${randPart}`;
+}
+
 export default function Aisearch({ onSend }: { onSend: () => void }) {
+   const abortControllerRef = useRef<AbortController | null>(null);
+
   const [selectedFiles, setSelectedFiles] = useState<FileData[]>([]);
   const [username, setUsername] = useState<string | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isInputFocused, setIsInputFocused] = useState(false);
-
+ const [isSkipped, setIsSkipped] = useState(false);
+ 
   const {
     query,
     setQuery,
@@ -114,6 +136,9 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
     if (!query?.trim() && selectedFiles.length === 0) return;
 
     setIsLoading(true);
+    setIsSkipped(false);
+ // Create a new AbortController for this request
+  abortControllerRef.current = new AbortController();
 
     if (query?.trim()) {
       setMessages((prev) => [...prev, { sender: "user", content: query }]);
@@ -127,15 +152,18 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
       // Upload multiple files if any are selected
       if (selectedFiles.length > 0) {
         const formData = new FormData();
+        const sessionId = generateSessionToken();
         
         // Add all selected files to FormData
-        selectedFiles.forEach((fileData, index) => {
-          formData.append(`files`, fileData.file);
+        selectedFiles.forEach((fileData) => {
+          formData.append(`file`, fileData.file);
         });
+        formData.append(`session_id`, sessionId);
 
         const uploadRes = await fetchWithAuth(API_ROUTES.upload, {
           method: "POST",
           body: formData,
+          signal: abortControllerRef.current.signal,
         });
 
         if (!uploadRes.ok) throw new Error("File upload failed");
@@ -171,12 +199,15 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
             type: f.type
           }))
         }),
+        signal: abortControllerRef.current.signal,
       });
 
       const data = await res.json();
       const extracted = extractLastResponse(data?.response || "")
+      console.log(isSkipped, "isLoading state in sendMessage");
       
-      setMessages((prev) =>
+        if(!isSkipped) {
+          setMessages((prev) =>
         prev.filter((msg) => !msg.isLoading).concat([
           {
           sender: "ai",
@@ -184,15 +215,28 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
           followup_questions: data.followup_questions || [],
           },
         ])
-      );
+      );     
+    } else {
+      // If skipped, just remove the loading message
+      setMessages((prev) => prev.filter((msg) => !msg.isLoading));
+    }
       setConversationHistory(data?.conversation_history);
     } catch (err) {
       console.error("Error during ask:", err);
+     if( err instanceof Error && err.name === "AbortError") {
+         setMessages((prev) =>
+          prev.filter((msg) => !msg.isLoading).concat([
+            { sender: "ai", content: "The request was aborted." },
+          ])
+        );
+      }else{
+
       setMessages((prev) =>
         prev.filter((msg) => !msg.isLoading).concat([
           { sender: "ai", content: "Something went wrong." },
         ])
       );
+      }
     }
 
       setSelectedFiles([]);
@@ -241,6 +285,19 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
     .reverse()
     .find((msg) => msg.sender === "ai" && !msg.isLoading);
 
+        const handleLoadingState = (idx: number) => {
+       
+
+           // Abort the ongoing request if it exists
+          if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+          }
+
+            setIsSkipped(true)
+              setIsLoading(false);
+          
+          };
+
   return (
     <div id="chat-box-main" ref={chatContainerRef} className="flex flex-col minarea-max-hright">
       
@@ -254,7 +311,7 @@ export default function Aisearch({ onSend }: { onSend: () => void }) {
         <div className="flex flex-col gap-3 text-left mt-auto text-xs subtitle w-full max-w-7xl m-auto">
           {messages.length === 0 && <WelcomeMessage username={username} />}
           <div className="flex flex-col h-full">
-            <ChatMessages messages={messages} initials={initials} />
+          <ChatMessages messages={messages} initials={initials} handleLoadingState={handleLoadingState}/>
             {latestAIMessage && (
               <FollowUpQuestions
                 followupQuestions={latestAIMessage.followup_questions || []}

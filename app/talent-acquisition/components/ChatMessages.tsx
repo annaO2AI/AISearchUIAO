@@ -11,9 +11,10 @@ interface Message {
 interface ChatMessagesProps {
   messages: Message[];
   initials: string;
+  handleLoadingState?: any;
 }
 
-export default function ChatMessages({ messages, initials }: ChatMessagesProps) {
+export default function ChatMessages({ messages, initials, handleLoadingState }: ChatMessagesProps) {
   // Function to format markdown content
   const formatMessageContent = (content: string) => {
     return content
@@ -57,9 +58,15 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
             }`}
           >
             {msg.isLoading ? (
-              <div className="flex items-center gap-2">
-                <LoganimationsIcon width={40} height={40} />
-              </div>
+             <div className="flex items-center gap-2">
+  <LoganimationsIcon width={40} height={40} />
+  <button
+    className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white px-6 py-2 rounded-full flex items-center gap-1 text-sm cursor-pointer"
+    onClick={() => handleLoadingState(idx)}
+  >
+    STOP Request
+  </button>
+</div>
             ) : msg.content?.startsWith("📎") && msg.fileType ? (
               <div className="flex items-center gap-2">
                 {msg.fileType === "pdf" ? <PDFIcon width={20} /> : null}
