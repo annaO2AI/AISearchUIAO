@@ -42,6 +42,50 @@ function generateSessionToken(): string {
   return `${datePart}-${timePart}-${msPart}-${randPart}`;
 }
 
+function parseAndFormatResponse(response: string) {
+  try {
+    const parsed = JSON.parse(response);
+
+    // Case 1: Resume data (array of objects with name fields)
+    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].name) {
+      return formatResumeData(parsed);
+    }
+
+    // Case 2: Message object
+    if (typeof parsed === 'object' && parsed.message) {
+      return parsed.message;
+    }
+
+    return response;
+  } catch (error) {
+    return response;
+  }
+}
+
+
+// Function to format resume data into readable format
+type ResumeData = {
+  name: string;
+  content?: string;
+  resume_url?: string;
+};
+
+function formatResumeData(resumeArray: ResumeData[]) {
+  return resumeArray.map((resume: ResumeData) => {
+    let formatted = `**${resume.name}**\n\n`;
+
+    if (resume.content) {
+      formatted += `**Summary:**\n${resume.content}\n\n`;
+    }
+
+    if (resume.resume_url) {
+      formatted += `**Resume:** <a href="${resume.resume_url}" target="_blank" style="color: #007bff; text-decoration: underline; rel="noopener noreferrer">View Resume</a>\n`;
+    }
+
+    return formatted;
+  }).join('\n---\n\n');
+}
+
 export default function Aisearch({ onSend }: { onSend: () => void }) {
    const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -211,11 +255,14 @@ setQuery("");
     if (selectedFiles.length === 0) {
   const data = await fetchAskApi();
   if(data){
+    // Parse and format the response
+    const formattedResponse = parseAndFormatResponse(data?.response || "");
+    
     setMessages((prev) =>
         prev.filter((msg) => !msg.isLoading).concat([
           {
           sender: "ai",
-           content: data?.response || "",
+           content: formattedResponse,
           followup_questions: data.followup_questions || [],
           },
         ]))
@@ -262,11 +309,14 @@ setQuery("");
   }
   const data = await fetchAskApi();
   if(data){
+    // Parse and format the response
+    const formattedResponse = parseAndFormatResponse(data?.response || "");
+    
     setMessages((prev) =>
         prev.filter((msg) => !msg.isLoading).concat([
           {
           sender: "ai",
-           content: data?.response || "",
+           content: formattedResponse,
           followup_questions: data.followup_questions || [],
           },
         ]))
@@ -368,12 +418,14 @@ setSelectedFiles([]);
       const data = await res.json();
       const extracted = extractLastResponse(data?.response || "")
       
+      // Parse and format the response
+      const formattedResponse = parseAndFormatResponse(data?.response || "");
        
           setMessages((prev) =>
         prev.filter((msg) => !msg.isLoading).concat([
           {
           sender: "ai",
-           content: data?.response || "",
+           content: formattedResponse,
           followup_questions: data.followup_questions || [],
           },
         ])
@@ -447,7 +499,7 @@ setSelectedFiles([]);
        
 
            // Abort the ongoing request if it exists
-          if (abortControllerRef.current) {
+           if (abortControllerRef.current) {
             abortControllerRef.current.abort();
           }
 
