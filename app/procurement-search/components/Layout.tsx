@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import TalentAcquisition from "./talent-acquisition"
+import ProcurementSearch from "./procurement-search"
 
 
 export default function Layout() {
@@ -12,7 +12,7 @@ export default function Layout() {
 
   return (
     <>
-      <TalentAcquisition onSend={handleToggle} />
+      <ProcurementSearch onSend={handleToggle} />
     </>
   )
 }
