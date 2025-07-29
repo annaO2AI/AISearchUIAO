@@ -18,6 +18,13 @@ const API_BASE_URL_AISEARCH_AIOPS =
   process.env.NEXT_PUBLIC_API_BASE_URL_AISEARCH_AIOPS ||
   "https://ai-ops-123321-b8e0gnejhydcb7he.centralus-01.azurewebsites.net/"
 
+//procurement-search
+const API_BASE_URL_PROCUREMENT_SEARCH =
+  process.env.NEXT_PUBLIC_API_BASE_URL_PROCUREMENT_SEARCH ||
+  "https://procuremindrg-dnarhva9fnaneyaw.centralindia-01.azurewebsites.net"
+
+
+
 export const API_ROUTES = {
   audioFiles: `${API_BASE_URL}/audio-files`,
   models: `${API_BASE_URL}/models`,
@@ -43,4 +50,12 @@ export const API_ROUTES = {
    //AIOPs
    aiopsask: `${API_BASE_URL_AISEARCH_AIOPS}/ask`,
    
+
+   //procurement-search
+   analyzeSow: `${API_BASE_URL_PROCUREMENT_SEARCH}/analyze_sow`,
+   analyzeRFP: `${API_BASE_URL_PROCUREMENT_SEARCH}/analyze_rfp`,
+  generateMsa: `${API_BASE_URL_PROCUREMENT_SEARCH}/generate_msa`,
+  generateBaaSow : `${API_BASE_URL_PROCUREMENT_SEARCH}/generate_baa_sow`,
+
+
 }

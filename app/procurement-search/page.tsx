@@ -8,6 +8,10 @@ import ProcurementSearch from "./components/procurement-search"; // Import Talen
 // import HeaderAISearch from "../components/dashboard/HeaderAISearch";
 import HeaderAISearch from "../chat-ui/components/Header";
 import Breadcrumbs from "../components/dashboard/Breadcrumbs"; // Import Breadcrumbs component
+import ContractForm from "./components/ContractForm";
+import AnalyzeSow from "./components/AnalyzeSow";
+import ContractAgreementForm from "./components/ContractAgreementForm";
+import AnalyzeRFP from "./components/AnalyzeRFP";
 
 export default function ProcurementSearchPage() {
   const pathname = usePathname();
@@ -51,6 +55,10 @@ export default function ProcurementSearchPage() {
           
           <main>
             <ProcurementSearch onSend={() => console.log("Message sent")} />
+              <ContractForm />
+              <ContractAgreementForm />
+              <AnalyzeRFP />
+              <AnalyzeSow />
           </main>
         </div>
       </div>
