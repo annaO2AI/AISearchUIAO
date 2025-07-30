@@ -4,14 +4,9 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "../../components/dashboard/Sidebar";
 import { DashboardProvider } from "../../context/DashboardContext";
-import ProcurementSearch from "../components/procurement-search"; // Import TalentAcquisition directly
-// import HeaderAISearch from "../components/dashboard/HeaderAISearch";
 import HeaderAISearch from "../../chat-ui/components/Header";
 import Breadcrumbs from "../../components/dashboard/Breadcrumbs"; // Import Breadcrumbs component
 import ContractForm from "./ContractForm";
-import AnalyzeSow from "../analyze-sow/AnalyzeSow";
-import ContractAgreementForm from "./ContractAgreementForm";
-import AnalyzeRFP from "../analyze-rfp/AnalyzeRFP";
 
 export default function ProcurementSearchPage() {
   const pathname = usePathname();
@@ -53,11 +48,7 @@ export default function ProcurementSearchPage() {
           style={{ marginLeft: showSidebar ? sidebarWidth : 0 }}
         >
           <main>
-            {/* <ProcurementSearch onSend={() => console.log("Message sent")} /> */}
               <ContractForm />
-              {/* <ContractAgreementForm /> */}
-              {/* <AnalyzeRFP />
-              <AnalyzeSow /> */}
           </main>
         </div>
       </div>
