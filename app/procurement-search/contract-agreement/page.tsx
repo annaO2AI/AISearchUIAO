@@ -2,12 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import Sidebar from "../components/dashboard/Sidebar";
-import { DashboardProvider } from "../context/DashboardContext";
-import ProcurementSearch from "./components/procurement-search"; // Import TalentAcquisition directly
+import Sidebar from "../../components/dashboard/Sidebar";
+import { DashboardProvider } from "../../context/DashboardContext";
+import ProcurementSearch from "./../components/procurement-search"; // Import TalentAcquisition directly
 // import HeaderAISearch from "../components/dashboard/HeaderAISearch";
-import HeaderAISearch from "../chat-ui/components/Header";
-import Breadcrumbs from "../components/dashboard/Breadcrumbs"; // Import Breadcrumbs component
+import HeaderAISearch from "../../chat-ui/components/Header";
+import Breadcrumbs from "../../components/dashboard/Breadcrumbs"; // Import Breadcrumbs component
+import ContractForm from "../master-service-agreement/ContractForm";
+import AnalyzeSow from "../analyze-sow/AnalyzeSow";
+import ContractAgreementForm from "./ContractAgreementForm";
+import AnalyzeRFP from "../analyze-rfp/AnalyzeRFP";
 
 export default function ProcurementSearchPage() {
   const pathname = usePathname();
@@ -29,7 +33,7 @@ export default function ProcurementSearchPage() {
   const sidebarWidth = isSidebarExpanded ? 256 : 64;
 
   // Show sidebar on the talent-acquisition page
-   const showSidebar =  pathname === "/procurement-search" ;
+   const showSidebar =  pathname === "/procurement-search/contract-agreement" ;
 
   return (
     <DashboardProvider>
@@ -48,9 +52,12 @@ export default function ProcurementSearchPage() {
           className="flex flex-col flex-1 transition-all duration-300 ease-in-out"
           style={{ marginLeft: showSidebar ? sidebarWidth : 0 }}
         >
-          
           <main>
-            <ProcurementSearch onSend={() => console.log("Message sent")} />
+            {/* <ProcurementSearch onSend={() => console.log("Message sent")} /> */}
+              {/* <ContractForm /> */}
+              <ContractAgreementForm />
+              {/* <AnalyzeRFP />
+              <AnalyzeSow /> */}
           </main>
         </div>
       </div>

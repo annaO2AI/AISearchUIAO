@@ -22,7 +22,17 @@ const menuItems = [
     icon: AiIcon,
     subItems: [
       { label: "Talent Acquisition", href: "/talent-acquisition", icon: ArroTabIcon },
-      { label: "Procurement Search", href: "/procurement-search", icon: ArroTabIcon },
+      {
+        label: "Procurement Search",
+        href: "/procurement-search",
+        icon: ArroTabIcon,
+        subItems: [
+          { label: "Service Agreement", href: "/procurement-search/master-service-agreement", icon: ArroTabIcon },
+          { label: "Contract Agreement", href: "/procurement-search/contract-agreement", icon: ArroTabIcon },
+          { label: "Analyze RFP", href: "/procurement-search/analyze-rfp", icon: ArroTabIcon },
+          { label: "analyze SOW", href: "/procurement-search/analyze-sow", icon: ArroTabIcon },
+        ],
+      },
       { label: "Finance Search", href: "/", icon: ArroTabIcon },
       { label: "Legal Search", href: "/", icon: ArroTabIcon },
     ],
@@ -120,24 +130,51 @@ export default function Sidebar({
             <div
               className={clsx(
                 "overflow-hidden transition-all duration-300",
-                openMenu === menu.id ? "max-h-60" : "max-h-0"
+                openMenu === menu.id ? "max-h-70" : "max-h-0"
               )}
             >
               {menu.subItems.map((subItem) => (
-                <a
-                  key={subItem.label}
-                  href={subItem.href}
-                  onClick={handleSubItemClick}
-                  className="flex block px-4 py-4 hover:bg-gray-200 gap-3 bg-gray-100 min-w-[20px]"
-                >
-                  {isExpanded ? (
-                    <>
-                      <subItem.icon width={20} className="min-w-[20px]" /> {subItem.label}
-                    </>
-                  ) : (
-                    <subItem.icon width={20} className="min-w-[20px]" />
+                <div key={subItem.label}>
+                  <a
+                    href={subItem.href}
+                    onClick={handleSubItemClick}
+                    className="flex block px-4 py-4 hover:bg-gray-200 gap-3 bg-gray-100 min-w-[20px]"
+                  >
+                    {isExpanded ? (
+                      <>
+                        <subItem.icon width={20} className="min-w-[20px]" /> {subItem.label}
+                      </>
+                    ) : (
+                      <subItem.icon width={20} className="min-w-[20px]" />
+                    )}
+                  </a>
+                  {/* Render nested subitems for Procurement Search */}
+                  {subItem.subItems && openMenu === menu.id && (
+                    <div
+                      className={clsx(
+                        "overflow-hidden transition-all duration-300",
+                        openMenu === menu.id ? "max-h-60" : "max-h-0"
+                      )}
+                    >
+                      {subItem.subItems.map((nestedItem) => (
+                        <a
+                          key={nestedItem.label}
+                          href={nestedItem.href}
+                          onClick={handleSubItemClick}
+                          className="flex block px-8 py-4 hover:bg-gray-200 gap-3 bg-gray-50 min-w-[20px]"
+                        >
+                          {isExpanded ? (
+                            <>
+                              <nestedItem.icon width={20} className="min-w-[20px]" /> {nestedItem.label}
+                            </>
+                          ) : (
+                            <nestedItem.icon width={20} className="min-w-[20px]" />
+                          )}
+                        </a>
+                      ))}
+                    </div>
                   )}
-                </a>
+                </div>
               ))}
             </div>
           </div>

@@ -52,10 +52,11 @@ export const API_ROUTES = {
    
 
    //procurement-search
+   querySow: `${API_BASE_URL_PROCUREMENT_SEARCH}/query`,
    analyzeSow: `${API_BASE_URL_PROCUREMENT_SEARCH}/analyze_sow`,
    analyzeRFP: `${API_BASE_URL_PROCUREMENT_SEARCH}/analyze_rfp`,
-  generateMsa: `${API_BASE_URL_PROCUREMENT_SEARCH}/generate_msa`,
-  generateBaaSow : `${API_BASE_URL_PROCUREMENT_SEARCH}/generate_baa_sow`,
+   generateMsa: `${API_BASE_URL_PROCUREMENT_SEARCH}/generate_msa`,
+   generateBaaSow : `${API_BASE_URL_PROCUREMENT_SEARCH}/generate_baa_sow`,
 
 
 }
