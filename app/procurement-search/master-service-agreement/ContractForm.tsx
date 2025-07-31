@@ -4,7 +4,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import ReactMarkdown from "react-markdown";
 import { API_ROUTES } from "@/app/constants/api";
-import { apiRequest } from "@/app/utils/axios";
 
 interface ContractFormValues {
   company: string;
@@ -51,7 +50,7 @@ const ContractForm = () => {
     effective_date: "",
     start_date: "",
     end_date: "",
-    temperature: "",
+    temperature: "0.7",
   };
 
   const validationSchema = Yup.object({
@@ -72,22 +71,47 @@ const ContractForm = () => {
     temperature: Yup.string(),
   });
 
+  const handleSubmit = async (values: ContractFormValues) => {
+    setIsLoading(true);
+    setError(null);
+    setResponse(null);
+
+    try {
+      // Convert form values to URLSearchParams
+      const params = new URLSearchParams();
+      Object.entries(values).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          params.append(key, value.toString());
+        }
+      });
+
+      const response = await fetch(API_ROUTES.generateMsa, {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result: ApiResponse = await response.json();
+      setResponse(result);
+    } catch (err) {
+      console.error("Failed to generate contract:", err);
+      setError("Failed to generate contract. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: async (values) => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const res = await apiRequest('POST', API_ROUTES.generateMsa, values);
-        setResponse(res);
-      } catch (err) {
-        console.error("Failed to generate MSA:", err);
-        setError("Failed to generate MSA. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    },
+    onSubmit: handleSubmit,
   });
 
   return (
@@ -175,7 +199,7 @@ const ContractForm = () => {
               </div>
             </div>
           </div>
-
+          
           {/* Client Information Section */}
           <div className="border-b pb-4">
             <h2 className="text-lg font-semibold mb-3">Client Information</h2>
@@ -253,7 +277,7 @@ const ContractForm = () => {
               </div>
             </div>
           </div>
-
+          
           {/* Contract Details Section */}
           <div className="border-b pb-4">
             <h2 className="text-lg font-semibold mb-3">Contract Details</h2>
@@ -313,7 +337,7 @@ const ContractForm = () => {
               </div>
             </div>
           </div>
-
+          
           {/* Dates Section */}
           <div className="border-b pb-4">
             <h2 className="text-lg font-semibold mb-3">Dates</h2>
@@ -373,7 +397,7 @@ const ContractForm = () => {
               </div>
             </div>
           </div>
-
+          
           {/* Temperature Field */}
           <div>
             <label htmlFor="temperature" className="block text-sm font-medium text-gray-700">

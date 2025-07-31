@@ -1,10 +1,8 @@
-// components/ContractAgreementForm.tsx
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import { API_ROUTES } from '@/app/constants/api';
 import { useState } from 'react';
-import { apiRequest } from '@/app/utils/axios';
+import ReactMarkdown from 'react-markdown';
 
-interface ContractAgreementValues {
+type FormData = {
   doc_type: string;
   company_name: string;
   client_name: string;
@@ -17,13 +15,18 @@ interface ContractAgreementValues {
   title_1: string;
   signer_2: string;
   title_2: string;
-  temperature?: string;
-}
+  temperature: number;
+};
 
-const ContractAgreementForm = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+type ApiResponse = {
+  message: string;
+  docx_download_url: string;
+  pdf_download_url: string;
+  markdown: string;
+};
 
-  const initialValues: ContractAgreementValues = {
+export default function DocumentGeneratorForm() {
+  const [formData, setFormData] = useState<FormData>({
     doc_type: '',
     company_name: '',
     client_name: '',
@@ -36,61 +39,63 @@ const ContractAgreementForm = () => {
     title_1: '',
     signer_2: '',
     title_2: '',
-    temperature: '',
+    temperature: 0.7
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState('');
+  const [response, setResponse] = useState<ApiResponse | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'temperature' ? parseFloat(value) : value
+    }));
   };
 
-  const validationSchema = Yup.object({
-    doc_type: Yup.string().required('Document type is required'),
-    company_name: Yup.string().required('Company name is required'),
-    client_name: Yup.string().required('Client name is required'),
-    services: Yup.string().required('Services description is required'),
-    start_date: Yup.date().required('Start date is required'),
-    end_date: Yup.date()
-      .required('End date is required')
-      .min(Yup.ref('start_date'), 'End date must be after start date'),
-    termination: Yup.string().required('Termination terms are required'),
-    confidentiality: Yup.string().required('Confidentiality terms are required'),
-    signer_1: Yup.string().required('First signer name is required'),
-    title_1: Yup.string().required('First signer title is required'),
-    signer_2: Yup.string().required('Second signer name is required'),
-    title_2: Yup.string().required('Second signer title is required'),
-    temperature: Yup.string()
-      .matches(/^-?\d*\.?\d+$/, 'Must be a valid number')
-      .notRequired(),
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitMessage('');
+    setResponse(null);
 
-  const formik = useFormik({
-    initialValues,
-    validationSchema,
-    onSubmit: async (values) => {
-      setIsSubmitting(true);
-      try {
-        // Format dates for display
-        const formattedValues = {
-          ...values,
-          start_date: new Date(values.start_date).toLocaleDateString(),
-          end_date: new Date(values.end_date).toLocaleDateString(),
-        };
+    try {
+      const params = new URLSearchParams();
+      Object.entries(formData).forEach(([key, value]) => {
+        params.append(key, value.toString());
+      });
 
-        console.log('Form submission:', formattedValues);
-          const res = await apiRequest('POST',"/generate_baa_sow", formattedValues);
-        // Simulate API call
-        formik.resetForm();
-      } catch (error) {
-        console.error('Submission error:', error);
-        alert('Failed to submit contract');
-      } finally {
-        setIsSubmitting(false);
+      const response = await fetch(API_ROUTES.generateBaaSow , {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    },
-  });
+
+      const result: ApiResponse = await response.json();
+      setResponse(result);
+      setSubmitMessage('Document generated successfully!');
+    } catch (error) {
+      setSubmitMessage('Error generating document. Please try again.');
+      console.error('Error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className='max-w-4xl mx-auto pt-12 mb-16'>
-      <h1 className="text-2xl font-bold mb-6 pt-6 mt-6">Contract Agreement Form</h1>
-      <div className=" p-12 bg-white rounded-lg shadow-md mt-6">
-        <form onSubmit={formik.handleSubmit} className="space-y-6">
-          {/* Document Type and Basic Info */}
+      <h1 className="text-2xl font-bold mb-6 pt-6 mt-6">Document Generator</h1>
+      <div className="p-12 bg-white rounded-lg shadow-md mt-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Document Type and Temperature */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label htmlFor="doc_type" className="block text-sm font-medium text-gray-700 mb-1">
@@ -99,276 +104,268 @@ const ContractAgreementForm = () => {
               <select
                 id="doc_type"
                 name="doc_type"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.doc_type}
+                value={formData.doc_type}
+                onChange={handleChange}
+                required
                 className="w-full rounded border border-gray-300 p-2"
               >
                 <option value="">Select document type</option>
-                <option value="service_agreement">Service Agreement</option>
-                <option value="nda">Non-Disclosure Agreement</option>
-                <option value="contract">General Contract</option>
-                <option value="sow">Statement of Work</option>
+                <option value="BAA">BAA</option>
+                <option value="SOW">SOW</option>
               </select>
-              {formik.touched.doc_type && formik.errors.doc_type && (
-                <div className="text-red-500 text-sm mt-1">{formik.errors.doc_type}</div>
-              )}
             </div>
 
             <div>
               <label htmlFor="temperature" className="block text-sm font-medium text-gray-700 mb-1">
-                Temperature (Optional)
+                Temperature
               </label>
               <input
+                type="number"
                 id="temperature"
                 name="temperature"
-                type="text"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.temperature}
-                placeholder="e.g., 36.5"
+                min="0"
+                max="1"
+                step="0.1"
+                value={formData.temperature}
+                onChange={handleChange}
                 className="w-full rounded border border-gray-300 p-2"
               />
-              {formik.touched.temperature && formik.errors.temperature && (
-                <div className="text-red-500 text-sm mt-1">{formik.errors.temperature}</div>
-              )}
+              <p className="mt-1 text-sm text-gray-500">Controls randomness (default: 0.7)</p>
             </div>
           </div>
 
-          {/* Parties Information */}
-          <div className="border-t pt-4">
-            <h2 className="text-lg font-semibold mb-4">Parties Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Company Name *
-                </label>
-                <input
-                  id="company_name"
-                  name="company_name"
-                  type="text"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.company_name}
-                  className="w-full rounded border border-gray-300 p-2"
-                />
-                {formik.touched.company_name && formik.errors.company_name && (
-                  <div className="text-red-500 text-sm mt-1">{formik.errors.company_name}</div>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="client_name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Client Name *
-                </label>
-                <input
-                  id="client_name"
-                  name="client_name"
-                  type="text"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.client_name}
-                  className="w-full rounded border border-gray-300 p-2"
-                />
-                {formik.touched.client_name && formik.errors.client_name && (
-                  <div className="text-red-500 text-sm mt-1">{formik.errors.client_name}</div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Contract Terms */}
-          <div className="border-t pt-4">
-            <h2 className="text-lg font-semibold mb-4">Contract Terms</h2>
-            
-            <div className="mb-4">
-              <label htmlFor="services" className="block text-sm font-medium text-gray-700 mb-1">
-                Services Description *
+          {/* Company and Client Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 mb-1">
+                Company Name *
               </label>
-              <textarea
-                id="services"
-                name="services"
-                rows={4}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.services}
+              <input
+                type="text"
+                id="company_name"
+                name="company_name"
+                value={formData.company_name}
+                onChange={handleChange}
+                required
                 className="w-full rounded border border-gray-300 p-2"
               />
-              {formik.touched.services && formik.errors.services && (
-                <div className="text-red-500 text-sm mt-1">{formik.errors.services}</div>
-              )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-              <div>
-                <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Date *
-                </label>
-                <input
-                  id="start_date"
-                  name="start_date"
-                  type="date"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.start_date}
-                  className="w-full rounded border border-gray-300 p-2"
-                />
-                {formik.touched.start_date && formik.errors.start_date && (
-                  <div className="text-red-500 text-sm mt-1">{formik.errors.start_date}</div>
-                )}
-              </div>
+            <div>
+              <label htmlFor="client_name" className="block text-sm font-medium text-gray-700 mb-1">
+                Client Name *
+              </label>
+              <input
+                type="text"
+                id="client_name"
+                name="client_name"
+                value={formData.client_name}
+                onChange={handleChange}
+                required
+                className="w-full rounded border border-gray-300 p-2"
+              />
+            </div>
+          </div>
 
-              <div>
-                <label htmlFor="end_date" className="block text-sm font-medium text-gray-700 mb-1">
-                  End Date *
-                </label>
-                <input
-                  id="end_date"
-                  name="end_date"
-                  type="date"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.end_date}
-                  className="w-full rounded border border-gray-300 p-2"
-                />
-                {formik.touched.end_date && formik.errors.end_date && (
-                  <div className="text-red-500 text-sm mt-1">{formik.errors.end_date}</div>
-                )}
-              </div>
+          {/* Services */}
+          <div>
+            <label htmlFor="services" className="block text-sm font-medium text-gray-700 mb-1">
+              Services *
+            </label>
+            <textarea
+              id="services"
+              name="services"
+              value={formData.services}
+              onChange={handleChange}
+              required
+              rows={4}
+              className="w-full rounded border border-gray-300 p-2"
+            />
+          </div>
+
+          {/* Dates */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 mb-1">
+                Start Date *
+              </label>
+              <input
+                type="date"
+                id="start_date"
+                name="start_date"
+                value={formData.start_date}
+                onChange={handleChange}
+                required
+                className="w-full rounded border border-gray-300 p-2"
+              />
             </div>
 
-            <div className="mb-4">
+            <div>
+              <label htmlFor="end_date" className="block text-sm font-medium text-gray-700 mb-1">
+                End Date *
+              </label>
+              <input
+                type="date"
+                id="end_date"
+                name="end_date"
+                value={formData.end_date}
+                onChange={handleChange}
+                required
+                className="w-full rounded border border-gray-300 p-2"
+              />
+            </div>
+          </div>
+
+          {/* Terms */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
               <label htmlFor="termination" className="block text-sm font-medium text-gray-700 mb-1">
                 Termination Terms *
               </label>
-              <textarea
+              <input
+                type="text"
                 id="termination"
                 name="termination"
-                rows={3}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.termination}
+                value={formData.termination}
+                onChange={handleChange}
+                required
                 className="w-full rounded border border-gray-300 p-2"
               />
-              {formik.touched.termination && formik.errors.termination && (
-                <div className="text-red-500 text-sm mt-1">{formik.errors.termination}</div>
-              )}
             </div>
 
             <div>
               <label htmlFor="confidentiality" className="block text-sm font-medium text-gray-700 mb-1">
                 Confidentiality Terms *
               </label>
-              <textarea
+              <input
+                type="text"
                 id="confidentiality"
                 name="confidentiality"
-                rows={3}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.confidentiality}
+                value={formData.confidentiality}
+                onChange={handleChange}
+                required
                 className="w-full rounded border border-gray-300 p-2"
               />
-              {formik.touched.confidentiality && formik.errors.confidentiality && (
-                <div className="text-red-500 text-sm mt-1">{formik.errors.confidentiality}</div>
-              )}
             </div>
           </div>
 
-          {/* Signatures */}
-          <div className="border-t pt-4">
-            <h2 className="text-lg font-semibold mb-4">Signatures</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="border p-4 rounded">
-                <h3 className="font-medium mb-3">Company Representative</h3>
-                <div className="mb-3">
-                  <label htmlFor="signer_1" className="block text-sm font-medium text-gray-700 mb-1">
-                    Name *
-                  </label>
-                  <input
-                    id="signer_1"
-                    name="signer_1"
-                    type="text"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.signer_1}
-                    className="w-full rounded border border-gray-300 p-2"
-                  />
-                  {formik.touched.signer_1 && formik.errors.signer_1 && (
-                    <div className="text-red-500 text-sm mt-1">{formik.errors.signer_1}</div>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="title_1" className="block text-sm font-medium text-gray-700 mb-1">
-                    Title *
-                  </label>
-                  <input
-                    id="title_1"
-                    name="title_1"
-                    type="text"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.title_1}
-                    className="w-full rounded border border-gray-300 p-2"
-                  />
-                  {formik.touched.title_1 && formik.errors.title_1 && (
-                    <div className="text-red-500 text-sm mt-1">{formik.errors.title_1}</div>
-                  )}
-                </div>
+          {/* Signers */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="border p-4 rounded">
+              <h3 className="font-medium mb-3">Company Representative</h3>
+              <div className="mb-3">
+                <label htmlFor="signer_1" className="block text-sm font-medium text-gray-700 mb-1">
+                  Name *
+                </label>
+                <input
+                  type="text"
+                  id="signer_1"
+                  name="signer_1"
+                  value={formData.signer_1}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded border border-gray-300 p-2"
+                />
               </div>
+              <div>
+                <label htmlFor="title_1" className="block text-sm font-medium text-gray-700 mb-1">
+                  Title *
+                </label>
+                <input
+                  type="text"
+                  id="title_1"
+                  name="title_1"
+                  value={formData.title_1}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded border border-gray-300 p-2"
+                />
+              </div>
+            </div>
 
-              <div className="border p-4 rounded">
-                <h3 className="font-medium mb-3">Client Representative</h3>
-                <div className="mb-3">
-                  <label htmlFor="signer_2" className="block text-sm font-medium text-gray-700 mb-1">
-                    Name *
-                  </label>
-                  <input
-                    id="signer_2"
-                    name="signer_2"
-                    type="text"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.signer_2}
-                    className="w-full rounded border border-gray-300 p-2"
-                  />
-                  {formik.touched.signer_2 && formik.errors.signer_2 && (
-                    <div className="text-red-500 text-sm mt-1">{formik.errors.signer_2}</div>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="title_2" className="block text-sm font-medium text-gray-700 mb-1">
-                    Title *
-                  </label>
-                  <input
-                    id="title_2"
-                    name="title_2"
-                    type="text"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.title_2}
-                    className="w-full rounded border border-gray-300 p-2"
-                  />
-                  {formik.touched.title_2 && formik.errors.title_2 && (
-                    <div className="text-red-500 text-sm mt-1">{formik.errors.title_2}</div>
-                  )}
-                </div>
+            <div className="border p-4 rounded">
+              <h3 className="font-medium mb-3">Client Representative</h3>
+              <div className="mb-3">
+                <label htmlFor="signer_2" className="block text-sm font-medium text-gray-700 mb-1">
+                  Name *
+                </label>
+                <input
+                  type="text"
+                  id="signer_2"
+                  name="signer_2"
+                  value={formData.signer_2}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded border border-gray-300 p-2"
+                />
+              </div>
+              <div>
+                <label htmlFor="title_2" className="block text-sm font-medium text-gray-700 mb-1">
+                  Title *
+                </label>
+                <input
+                  type="text"
+                  id="title_2"
+                  name="title_2"
+                  value={formData.title_2}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded border border-gray-300 p-2"
+                />
               </div>
             </div>
           </div>
 
-          <div className="pt-4">
+          {/* Submit Button */}
+          <div>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded hover:bg-blue-700 disabled:bg-blue-300 font-medium"
               disabled={isSubmitting}
+              className="w-full bg-indigo-600 text-white py-3 px-4 rounded hover:bg-indigo-700 disabled:bg-indigo-300 font-medium"
             >
-              {isSubmitting ? 'Processing...' : 'Generate Contract Agreement'}
+              {isSubmitting ? 'Generating...' : 'Generate Document'}
             </button>
           </div>
+
+          {/* Submission Message */}
+          {submitMessage && (
+            <div className={`mt-4 p-3 rounded text-center ${submitMessage.includes('Error') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+              {submitMessage}
+            </div>
+          )}
         </form>
+
+        {/* Response Display */}
+        {response && (
+          <div className="mt-8 space-y-6 p-6 border rounded-lg bg-gray-50">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-800">{response.message}</h2>
+              <div className="flex space-x-3">
+                <a
+                  href={response.docx_download_url}
+                  download
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                >
+                  Download DOCX
+                </a>
+                <a
+                  href={response.pdf_download_url}
+                  download
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
+                >
+                  Download PDF
+                </a>
+              </div>
+            </div>
+
+            <div className="p-4 bg-white rounded-md border overflow-auto max-h-[500px]">
+              <div className="prose max-w-none">
+                <ReactMarkdown>{response.markdown}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default ContractAgreementForm; 
+}
