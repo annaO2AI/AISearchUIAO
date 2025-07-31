@@ -7,7 +7,7 @@ import {
   AIsearchIcon,
   DOCIcon,
   PDFIcon,
-  LogIcon
+  LogIcon,
 } from "./icons";
 import { useAISearch } from "../../context/AISearchContext";
 import { fetchWithAuth } from "@/app/utils/axios";
@@ -16,6 +16,7 @@ import { decodeJWT } from "@/app/utils/decodeJWT";
 import FollowUpQuestions from "./FollowUpQuestions";
 import WelcomeMessage from "./WelcomeMessage";
 import ChatMessages from "./ChatMessages";
+import { marked } from "marked";
 
 interface FileData {
   file: File;
@@ -26,16 +27,8 @@ interface FileData {
 function generateSessionToken(): string {
   const now = new Date();
   const pad = (n: number, len = 2) => n.toString().padStart(len, "0");
-  const datePart = [
-    now.getFullYear(),
-    pad(now.getMonth() + 1),
-    pad(now.getDate())
-  ].join("");
-  const timePart = [
-    pad(now.getHours()),
-    pad(now.getMinutes()),
-    pad(now.getSeconds())
-  ].join("");
+  const datePart = [now.getFullYear(), pad(now.getMonth() + 1), pad(now.getDate())].join("");
+  const timePart = [pad(now.getHours()), pad(now.getMinutes()), pad(now.getSeconds())].join("");
   const msPart = pad(now.getMilliseconds(), 3);
   const randPart = Math.random().toString(36).slice(2, 8);
   return `${datePart}-${timePart}-${msPart}-${randPart}`;
@@ -45,17 +38,18 @@ function parseAndFormatResponse(response: string) {
   try {
     const parsed = JSON.parse(response);
     if (parsed.response) {
-      return parsed.response; // Extract the 'response' field
+      return marked.parse(parsed.response);
     }
     if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].name) {
       return formatResumeData(parsed);
     }
-    if (typeof parsed === 'object' && parsed.message) {
-      return parsed.message;
+    if (typeof parsed === "object" && parsed.message) {
+      return marked.parse(parsed.message);
     }
-    return response;
+    return marked.parse(response);
   } catch (error) {
-    return response; // Return raw response if not JSON
+    console.error("Error parsing response:", error, response);
+    return response;
   }
 }
 
@@ -66,16 +60,18 @@ type ResumeData = {
 };
 
 function formatResumeData(resumeArray: ResumeData[]) {
-  return resumeArray.map((resume: ResumeData) => {
-    let formatted = `**${resume.name}**\n\n`;
-    if (resume.content) {
-      formatted += `**Summary:**\n${resume.content}\n\n`;
-    }
-    if (resume.resume_url) {
-      formatted += `**Resume:** <a href="${resume.resume_url}" target="_blank" style="color: #007bff; text-decoration: underline; rel="noopener noreferrer">View Resume</a>\n`;
-    }
-    return formatted;
-  }).join('\n---\n\n');
+  return resumeArray
+    .map((resume: ResumeData) => {
+      let formatted = `**${resume.name}**\n\n`;
+      if (resume.content) {
+        formatted += `**Summary:**\n${resume.content}\n\n`;
+      }
+      if (resume.resume_url) {
+        formatted += `**Resume:** <a href="${resume.resume_url}" target="_blank" style="color: #007bff; text-decoration: underline; rel="noopener noreferrer">View Resume</a>\n`;
+      }
+      return formatted;
+    })
+    .join("\n---\n\n");
 }
 
 export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
@@ -84,6 +80,7 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
   const [username, setUsername] = useState<string | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null); // New ref for file input
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isSkipped, setIsSkipped] = useState(false);
 
@@ -178,76 +175,7 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
     }
   };
 
-  const handleMultipleUpload = async () => {
-    if (!query?.trim() && selectedFiles.length === 0) return;
-    setIsLoading(true);
-    setIsSkipped(false);
-    abortControllerRef.current = new AbortController();
-
-    try {
-      const formData = new FormData();
-      formData.append("query", query || "");
-      formData.append("temperature", "0.7");
-      formData.append("conversationId", conversationId || "");
-      formData.append("session_id", generateSessionToken());
-
-      if (selectedFiles.length > 0) {
-        selectedFiles.forEach((fileData) => {
-          formData.append("files", fileData.file, fileData.name);
-        });
-      }
-
-      if (query?.trim()) {
-        setMessages((prev) => [...prev, { sender: "user", content: query }]);
-      }
-
-      setMessages((prev) => [...prev, { sender: "ai", content: "Thinking...", isLoading: true }]);
-      setQuery("");
-
-      if (selectedFiles.length > 0) {
-        selectedFiles.forEach((fileData) => {
-          setMessages((prev) =>
-            prev.filter((msg) => !msg.isLoading).concat([
-              {
-                sender: "user",
-                content: `📎 ${fileData.name}`,
-                fileType: fileData.type,
-              },
-            ])
-          );
-        });
-      }
-
-      const data = await sendQuery(formData);
-      if (data) {
-        const formattedResponse = parseAndFormatResponse(JSON.stringify(data));
-        setMessages((prev) =>
-          prev.filter((msg) => !msg.isLoading).concat([
-            {
-              sender: "ai",
-              content: formattedResponse,
-              followup_questions: data.followup_questions || [],
-            },
-          ])
-        );
-        setConversationHistory(data?.conversation_history);
-      }
-    } catch (error) {
-      setMessages((prev) =>
-        prev.filter((msg) => !msg.isLoading).concat([
-          { sender: "ai", content: `Error: ${error instanceof Error ? error.message : "Something went wrong."}` },
-        ])
-      );
-    } finally {
-      setSelectedFiles([]);
-      setIsLoading(false);
-      if (inputRef.current && !isLoading) {
-        inputRef.current.focus();
-      }
-    }
-  };
-
-  const sendMessage = async () => {
+  const handleSendMessage = async () => {
     if (!query?.trim() && selectedFiles.length === 0) return;
 
     setIsLoading(true);
@@ -291,16 +219,31 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
       const data = await sendQuery(formData);
       if (data) {
         const formattedResponse = parseAndFormatResponse(JSON.stringify(data));
-        setMessages((prev) =>
-          prev.filter((msg) => !msg.isLoading).concat([
-            {
-              sender: "ai",
-              content: formattedResponse,
-              followup_questions: data.followup_questions || [],
-            },
-          ])
-        );
-        setConversationHistory(data?.conversation_history);
+        if (formattedResponse instanceof Promise) {
+          formattedResponse.then((resolvedContent) => {
+            setMessages((prev) =>
+              prev.filter((msg) => !msg.isLoading).concat([
+                {
+                  sender: "ai",
+                  content: resolvedContent,
+                  followup_questions: data.followup_questions || [],
+                },
+              ])
+            );
+            setConversationHistory(data?.conversation_history);
+          });
+        } else {
+          setMessages((prev) =>
+            prev.filter((msg) => !msg.isLoading).concat([
+              {
+                sender: "ai",
+                content: formattedResponse,
+                followup_questions: data.followup_questions || [],
+              },
+            ])
+          );
+          setConversationHistory(data?.conversation_history);
+        }
       }
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") {
@@ -312,7 +255,10 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
       } else {
         setMessages((prev) =>
           prev.filter((msg) => !msg.isLoading).concat([
-            { sender: "ai", content: `Error: ${err instanceof Error ? err.message : "Something went wrong."}` },
+            {
+              sender: "ai",
+              content: `Error: ${err instanceof Error ? err.message : "Something went wrong."}`,
+            },
           ])
         );
       }
@@ -322,18 +268,25 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
       if (inputRef.current && !isLoading) {
         inputRef.current.focus();
       }
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Reset file input after sending
+      }
+      onSend();
     }
   };
 
-  const handleFileChange = (e: any) => {
-    const files = Array.from(e.target.files) as File[];
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []) as File[];
     if (files.length > 0) {
-      const newFiles: FileData[] = files.map(file => ({
+      const newFiles: FileData[] = files.map((file) => ({
         file,
         name: file.name,
-        type: file.name.split(".").pop()?.toLowerCase() || ""
+        type: file.name.split(".").pop()?.toLowerCase() || "",
       }));
-      setSelectedFiles(prev => [...prev, ...newFiles]);
+      setSelectedFiles((prev) => [...prev, ...newFiles]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Reset file input after selection
+      }
     }
   };
 
@@ -377,13 +330,17 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
         <div className="flex flex-col gap-3 text-left mt-auto text-xs subtitle w-full max-w-7xl m-auto">
           {messages.length === 0 && <WelcomeMessage username={username} />}
           <div className="flex flex-col h-full">
-            <ChatMessages messages={messages} initials={initials} handleLoadingState={handleLoadingState}/>
+            <ChatMessages
+              messages={messages}
+              initials={initials}
+              handleLoadingState={handleLoadingState}
+            />
             {latestAIMessage && (
               <FollowUpQuestions
                 followupQuestions={latestAIMessage.followup_questions || []}
                 isLoading={isLoading}
                 setQuery={setQuery}
-                sendMessage={sendMessage}
+                sendMessage={handleSendMessage}
                 inputRef={inputRef}
               />
             )}
@@ -403,8 +360,9 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
                     >
                       {fileData.type === "doc" || fileData.type === "docx" ? (
                         <DOCIcon width={26} />
+                      ) : fileData.type === "pdf" ? (
+                        <PDFIcon width={24} />
                       ) : null}
-                      {fileData.type === "pdf" ? <PDFIcon width={24} /> : null}
                       <p className="text-sm text-gray-600">{fileData.name}</p>
                     </div>
                   ))}
@@ -417,7 +375,7 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
                   placeholder="Type your messages here..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                  onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
                   onFocus={() => setIsInputFocused(true)}
                   onBlur={() => setIsInputFocused(false)}
                   disabled={isLoading}
@@ -437,15 +395,13 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
                       className="hidden"
                       accept=".doc,.docx,.pdf"
                       multiple
+                      ref={fileInputRef} // Attach ref to file input
                     />
                   </label>
                 </div>
                 <button
                   disabled={isLoading}
-                  onClick={() => {
-                    abortControllerRef.current = null;
-                    handleMultipleUpload();
-                  }}
+                  onClick={handleSendMessage}
                   className={`bg-gradient-to-r from-indigo-500 to-blue-500 text-white p-6 py-2 rounded-full flex items-center gap-1 text-sm cursor-pointer ${
                     isLoading ? "opacity-50 cursor-not-allowed" : ""
                   }`}
