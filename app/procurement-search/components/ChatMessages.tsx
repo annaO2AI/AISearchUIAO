@@ -111,7 +111,7 @@ export default function ChatMessages({ messages, initials, handleLoadingState }:
               </div>
             ) : (
               <div
-                className="font-sans break-words m-0 leading-5"
+                className="font-sans break-words m-0 leading-5 procruement-search-chat"
                 dangerouslySetInnerHTML={{
                   __html: formatMessageContent(msg.content),
                 }}

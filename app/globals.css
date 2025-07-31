@@ -228,4 +228,8 @@ body {
   .chatmassage-wrapper li{
       margin-bottom: 15px;
   }
+  .procruement-search-chat p strong{
+      display: block;
+      margin-top: 15px;
+  }
 }
