@@ -229,7 +229,7 @@ body {
       margin-bottom: 15px;
   }
   .procruement-search-chat p strong{
-      display: block;
+      display: inline-block;
       margin-top: 15px;
       margin-bottom: 1px;
   }
