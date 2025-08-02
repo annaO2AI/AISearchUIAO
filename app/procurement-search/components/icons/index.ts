@@ -17,6 +17,7 @@ export { default as FinanaceSearch } from './FinanaceSearch';
 export { default as ITSearchIcon } from './ITSearchIcon';
 export { default as LegalSearchIcon } from './LegalSearchIcon';
 export { default as ArroTabIcon } from './ArroTabIcon';
+export { default as StopIcon } from './stopIcon';
 
 
 

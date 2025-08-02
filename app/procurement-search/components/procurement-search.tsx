@@ -8,6 +8,7 @@ import {
   DOCIcon,
   PDFIcon,
   LogIcon,
+  StopIcon
 } from "./icons";
 import { useAISearch } from "../../context/AISearchContext";
 import { fetchWithAuth } from "@/app/utils/axios";
@@ -80,7 +81,7 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
   const [username, setUsername] = useState<string | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null); // New ref for file input
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isSkipped, setIsSkipped] = useState(false);
 
@@ -269,7 +270,7 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
         inputRef.current.focus();
       }
       if (fileInputRef.current) {
-        fileInputRef.current.value = ""; // Reset file input after sending
+        fileInputRef.current.value = "";
       }
       onSend();
     }
@@ -285,7 +286,7 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
       }));
       setSelectedFiles((prev) => [...prev, ...newFiles]);
       if (fileInputRef.current) {
-        fileInputRef.current.value = ""; // Reset file input after selection
+        fileInputRef.current.value = "";
       }
     }
   };
@@ -310,7 +311,7 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
     .reverse()
     .find((msg) => msg.sender === "ai" && !msg.isLoading);
 
-  const handleLoadingState = (idx: number) => {
+  const handleLoadingState = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -330,11 +331,7 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
         <div className="flex flex-col gap-3 text-left mt-auto text-xs subtitle w-full max-w-7xl m-auto">
           {messages.length === 0 && <WelcomeMessage username={username} />}
           <div className="flex flex-col h-full">
-            <ChatMessages
-              messages={messages}
-              initials={initials}
-              handleLoadingState={handleLoadingState}
-            />
+            <ChatMessages messages={messages} initials={initials} />
             {latestAIMessage && (
               <FollowUpQuestions
                 followupQuestions={latestAIMessage.followup_questions || []}
@@ -395,19 +392,30 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
                       className="hidden"
                       accept=".doc,.docx,.pdf"
                       multiple
-                      ref={fileInputRef} // Attach ref to file input
+                      ref={fileInputRef}
                     />
                   </label>
                 </div>
-                <button
-                  disabled={isLoading}
-                  onClick={handleSendMessage}
-                  className={`bg-gradient-to-r from-indigo-500 to-blue-500 text-white p-6 py-2 rounded-full flex items-center gap-1 text-sm cursor-pointer ${
-                    isLoading ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                >
-                  {isLoading ? "Processing..." : "Send"} <SendIcon width={20} />
-                </button>
+                <div className="flex gap-2">
+                  {isLoading ? (
+                    <button
+                      className=" flex items-center gap-1 text-sm cursor-pointer"
+                      onClick={handleLoadingState}
+                    >
+                      <StopIcon width={20} />
+                    </button>
+                  ) : (
+                    <button
+                      disabled={isLoading}
+                      onClick={handleSendMessage}
+                      className={`bg-gradient-to-r from-indigo-500 to-blue-500 text-white p-6 py-2 rounded-full flex items-center gap-1 text-sm cursor-pointer ${
+                        isLoading ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                    >
+                      Send <SendIcon width={20} />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>

@@ -12,10 +12,9 @@ interface Message {
 interface ChatMessagesProps {
   messages: Message[];
   initials: string;
-  handleLoadingState?: any;
 }
 
-export default function ChatMessages({ messages, initials, handleLoadingState }: ChatMessagesProps) {
+export default function ChatMessages({ messages, initials }: ChatMessagesProps) {
   // Function to format markdown content
   const formatMessageContent = (content: string) => {
     let formattedContent = content;
@@ -30,33 +29,32 @@ export default function ChatMessages({ messages, initials, handleLoadingState }:
       // Treat as raw markdown if not JSON
     }
 
-    // Remove triple backticks and their content
-    formattedContent = formattedContent.replace(/```[\s\S]*?```/g, '');
+    // Remove triple backticks and their language identifier (e.g., ```markdown
+    formattedContent = formattedContent.replace(/```(?:markdown)?[\s\S]*?```/g, '');
+
+    // Remove <pre> and <code> tags but preserve their inner content
+    formattedContent = formattedContent.replace(/<pre\b[^>]*>([\s\S]*?)<\/pre>/g, '$1');
+    formattedContent = formattedContent.replace(/<code\b[^>]*>([\s\S]*?)<\/code>/g, '$1');
+
+    // Trim any leading/trailing whitespace or newlines
+    formattedContent = formattedContent.trim();
 
     // Remove --- separators
     formattedContent = formattedContent.replace(/---/g, '');
 
     // Convert markdown to HTML with Tailwind CSS styling
     return formattedContent
-      // Remove # from headers and apply styling
       .replace(/#+/g, '')
       .replace(/Protection of PHI under the Agreement/g, '<h3 class="text-xl font-semibold my-4 text-gray-900">Protection of PHI under the Agreement</h3>')
       .replace(/1\. Prohibited Uses and Disclosures/g, '<h4 class="text-lg font-semibold my-3 text-gray-900">1. Prohibited Uses and Disclosures</h4>')
       .replace(/2\. Reporting of Unauthorized Use\/Disclosure/g, '<h4 class="text-lg font-semibold my-3 text-gray-900">2. Reporting of Unauthorized Use/Disclosure</h4>')
       .replace(/3\. Mitigation of Harmful Effects/g, '<h4 class="text-lg font-semibold my-3 text-gray-900">3. Mitigation of Harmful Effects</h4>')
-      // Convert **text** to <strong> with Tailwind classes
       .replace(/\*\*([^\*]+)\*\*/g, '<strong class="font-semibold">$1</strong>')
-      // Convert numbered lists (e.g., 1. Text) to HTML list items
       .replace(/^(\d+\.\s+)(.+)$/gm, '<li class="my-1">$1$2</li>')
-      // Wrap numbered lists in <ol> tags with Tailwind classes
       .replace(/(<li class="my-1">\d+\.\s+.+<\/li>(\n<li class="my-1">\d+\.\s+.+<\/li>)*)/g, '<ol class=" my-1 mt-4">$1</ol>')
-      // Convert - Bulleted lists to HTML list items
       .replace(/^\s*-\s+(.+)/gm, '<li class="my-1">$1</li>')
-      // Wrap bulleted lists in <ul> tags with Tailwind classes
       .replace(/(<li class="my-1">.+<\/li>(\n<li class="my-1">.+<\/li>)*)/g, '<ul class=" my-1">$1</ul>')
-      // Style sources section
       .replace(/\*\*Sources:\*\*/g, '<strong class="block my-4 font-semibold">Sources:</strong>')
-      // Style citations like (COH, FH)
       .replace(/\((\w+(,\s*\w+)*)\)/g, '<span class="text-gray-600 italic ml-1">($1)</span>');
   };
 
@@ -94,12 +92,6 @@ export default function ChatMessages({ messages, initials, handleLoadingState }:
             {msg.isLoading ? (
               <div className="flex items-center gap-2">
                 <LoganimationsIcon width={40} height={40} />
-                <button
-                  className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white px-6 py-2 rounded-full flex items-center gap-1 text-sm cursor-pointer"
-                  onClick={() => handleLoadingState(idx)}
-                >
-                  STOP Request
-                </button>
               </div>
             ) : msg.content?.startsWith("📎") && msg.fileType ? (
               <div className="flex items-center gap-2">

@@ -21,7 +21,7 @@ const API_BASE_URL_AISEARCH_AIOPS =
 //procurement-search
 const API_BASE_URL_PROCUREMENT_SEARCH =
   process.env.NEXT_PUBLIC_API_BASE_URL_PROCUREMENT_SEARCH ||
-  "https://procuremindrg-dnarhva9fnaneyaw.centralindia-01.azurewebsites.net"
+  "https://procuremindai-hvf9hxhbhfgvaaa7.centralindia-01.azurewebsites.net/"
 
 
 
