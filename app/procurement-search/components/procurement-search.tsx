@@ -25,15 +25,7 @@ interface FileData {
   type: string;
 }
 
-function generateSessionToken(): string {
-  const now = new Date();
-  const pad = (n: number, len = 2) => n.toString().padStart(len, "0");
-  const datePart = [now.getFullYear(), pad(now.getMonth() + 1), pad(now.getDate())].join("");
-  const timePart = [pad(now.getHours()), pad(now.getMinutes()), pad(now.getSeconds())].join("");
-  const msPart = pad(now.getMilliseconds(), 3);
-  const randPart = Math.random().toString(36).slice(2, 8);
-  return `${datePart}-${timePart}-${msPart}-${randPart}`;
-}
+
 
 function parseAndFormatResponse(response: string) {
   try {
@@ -111,23 +103,6 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
     }
   }, []);
 
-  useEffect(() => {
-    const fetchConversationId = async () => {
-      try {
-        const res = await fetchWithAuth(API_ROUTES.conversations, {
-          method: "POST",
-        });
-        const data = await res.json();
-        if (data?.conversation_id) {
-          setConversationId(data?.conversation_id);
-        }
-      } catch (err) {
-        console.error("Failed to fetch conversation ID:", err);
-      }
-    };
-
-    fetchConversationId();
-  }, [setConversationId]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -187,8 +162,9 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
       const formData = new FormData();
       formData.append("query", query || "");
       formData.append("temperature", "0.7");
-      formData.append("conversationId", conversationId || "");
-      formData.append("session_id", generateSessionToken());
+       if (conversationId) {
+      formData.append('conversation_id', conversationId);
+    }
 
       if (selectedFiles.length > 0) {
         selectedFiles.forEach((fileData) => {
@@ -219,6 +195,7 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
 
       const data = await sendQuery(formData);
       if (data) {
+        setConversationId(data?.conversation_id)
         const formattedResponse = parseAndFormatResponse(JSON.stringify(data));
         if (formattedResponse instanceof Promise) {
           formattedResponse.then((resolvedContent) => {
