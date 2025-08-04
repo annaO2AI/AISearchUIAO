@@ -230,12 +230,20 @@ body {
   }
   .procruement-search-chat p strong{
       display: inline-block;
-      margin-top: 15px;
       margin-bottom: 1px;
   }
   .procruement-search-chat li{
     display: block;
     margin-top: 15px;
+  }
+  .procruement-search-chat h4, .procruement-search-chat h3 .procruement-search-chat h2{
+    margin-top: 15px;
+    font-weight: bold;
+  }
+  .procruement-search-chat hr{
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 
 }
