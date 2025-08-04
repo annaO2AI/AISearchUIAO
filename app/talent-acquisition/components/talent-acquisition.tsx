@@ -7,7 +7,8 @@ import {
   AIsearchIcon,
   DOCIcon,
   PDFIcon,
-  LogIcon
+  LogIcon,
+  StopIcon
 } from "./icons";
 import { useAISearch } from "../../context/AISearchContext";
 import { fetchWithAuth } from "@/app/utils/axios";
@@ -507,6 +508,8 @@ setSelectedFiles([]);
               setIsLoading(false);
           
           };
+          
+ 
 
   return (
     <div id="chat-box-main" ref={chatContainerRef} className="flex flex-col minarea-max-hright">
@@ -584,7 +587,7 @@ setSelectedFiles([]);
                     />
                   </label>
                 </div>
-                <button
+                {/* <button
                   disabled={isLoading}
                   onClick={() => {
                      abortControllerRef.current = null;
@@ -595,7 +598,28 @@ setSelectedFiles([]);
                   }`}
                 >
                   {isLoading ? "Processing..." : "Send"} <SendIcon width={20} />
-                </button>
+                </button> */}
+                <div className="flex gap-2">
+                  {isLoading ? (
+                    <button
+                      className=" flex items-center gap-1 text-sm cursor-pointer"
+                      onClick={() => handleLoadingState(0)}
+                    >
+                      <StopIcon width={20} />
+                    </button>
+                  ) : (
+                    <button
+                      disabled={isLoading}
+                      onClick={() => {
+                     abortControllerRef.current = null;
+                     handleMultipleUpload()}}
+                      className={`bg-gradient-to-r from-indigo-500 to-blue-500 text-white p-6 py-2 rounded-full flex items-center gap-1 text-sm cursor-pointer ${isLoading ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                    >
+                      Send <SendIcon width={20} />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>

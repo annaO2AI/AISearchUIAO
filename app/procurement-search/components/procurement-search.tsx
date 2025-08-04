@@ -348,7 +348,7 @@ export default function ProcurementSearch({ onSend }: { onSend: () => void }) {
                 isInputFocused ? "aisearchinput-focused" : ""
               }`}
             >
-              {selectedFiles.length > 0 && (
+              {!isLoading && selectedFiles.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {selectedFiles.map((fileData, index) => (
                     <div

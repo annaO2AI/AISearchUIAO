@@ -59,15 +59,15 @@ export default function ChatMessages({ messages, initials, handleLoadingState }:
           >
             {msg.isLoading ? (
              <div className="flex items-center gap-2">
-  <LoganimationsIcon width={40} height={40} />
-  <button
-    className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white px-6 py-2 rounded-full flex items-center gap-1 text-sm cursor-pointer"
-    onClick={() => handleLoadingState(idx)}
-  >
-    STOP Request
-  </button>
-</div>
-            ) : msg.content?.startsWith("📎") && msg.fileType ? (
+              <LoganimationsIcon width={40} height={40} />
+              {/* <button
+                className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white px-6 py-2 rounded-full flex items-center gap-1 text-sm cursor-pointer"
+                onClick={() => handleLoadingState(idx)}
+              >
+                STOP Request
+              </button> */}
+            </div>
+            ) : msg.sender === "user" && msg.content?.startsWith("📎") && msg.fileType ? (
               <div className="flex items-center gap-2">
                 {msg.fileType === "pdf" ? <PDFIcon width={20} /> : null}
                 {msg.fileType === "doc" || msg.fileType === "docx" ? (

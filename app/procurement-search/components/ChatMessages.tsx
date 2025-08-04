@@ -1,3 +1,4 @@
+// ChatMessages.tsx
 import React from "react";
 import { LoganimationsIcon, DOCIcon, PDFIcon, LogIcon } from "./icons";
 
@@ -93,7 +94,7 @@ export default function ChatMessages({ messages, initials }: ChatMessagesProps) 
               <div className="flex items-center gap-2">
                 <LoganimationsIcon width={40} height={40} />
               </div>
-            ) : msg.content?.startsWith("📎") && msg.fileType ? (
+            ) : msg.sender === "user" && msg.content?.startsWith("📎") && msg.fileType ? (
               <div className="flex items-center gap-2">
                 {msg.fileType === "pdf" ? <PDFIcon width={20} /> : null}
                 {msg.fileType === "doc" || msg.fileType === "docx" ? (
