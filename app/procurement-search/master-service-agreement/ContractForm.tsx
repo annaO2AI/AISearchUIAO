@@ -6,11 +6,11 @@ import ReactMarkdown from "react-markdown";
 import { API_ROUTES } from "@/app/constants/api";
 
 interface ContractFormValues {
-  company: string;
+  company_name: string;
   company_address: string;
   company_state: string;
   company_country: string;
-  client: string;
+  client_name: string;
   client_address: string;
   client_state: string;
   client_country: string;
@@ -36,11 +36,11 @@ const ContractForm = () => {
   const [error, setError] = useState<string | null>(null);
 
   const initialValues: ContractFormValues = {
-    company: "",
+    company_name: "",
     company_address: "",
     company_state: "",
     company_country: "",
-    client: "",
+    client_name: "",
     client_address: "",
     client_state: "",
     client_country: "",
@@ -54,11 +54,11 @@ const ContractForm = () => {
   };
 
   const validationSchema = Yup.object({
-    company: Yup.string().required("Company name is required"),
+    company_name: Yup.string().required("Company name is required"),
     company_address: Yup.string().required("Company address is required"),
     company_state: Yup.string().required("Company state is required"),
     company_country: Yup.string().required("Company country is required"),
-    client: Yup.string().required("Client name is required"),
+    client_name: Yup.string().required("Client name is required"),
     client_address: Yup.string().required("Client address is required"),
     client_state: Yup.string().required("Client state is required"),
     client_country: Yup.string().required("Client country is required"),
@@ -127,20 +127,20 @@ const ContractForm = () => {
             <h2 className="text-lg font-semibold mb-3">Company Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="company" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="company_name" className="block text-sm font-medium text-gray-700">
                   Company Name *
                 </label>
                 <input
-                  id="company"
-                  name="company"
+                  id="company_name"
+                  name="company_name"
                   type="text"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  value={formik.values.company}
+                  value={formik.values.company_name}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border"
                 />
-                {formik.touched.company && formik.errors.company ? (
-                  <div className="text-red-500 text-sm">{formik.errors.company}</div>
+                {formik.touched.company_name && formik.errors.company_name ? (
+                  <div className="text-red-500 text-sm">{formik.errors.company_name}</div>
                 ) : null}
               </div>
 
@@ -205,20 +205,20 @@ const ContractForm = () => {
             <h2 className="text-lg font-semibold mb-3">Client Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="client" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="client_name" className="block text-sm font-medium text-gray-700">
                   Client Name *
                 </label>
                 <input
-                  id="client"
-                  name="client"
+                  id="client_name"
+                  name="client_name"
                   type="text"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  value={formik.values.client}
+                  value={formik.values.client_name}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border"
                 />
-                {formik.touched.client && formik.errors.client ? (
-                  <div className="text-red-500 text-sm">{formik.errors.client}</div>
+                {formik.touched.client_name && formik.errors.client_name ? (
+                  <div className="text-red-500 text-sm">{formik.errors.client_name}</div>
                 ) : null}
               </div>
 
