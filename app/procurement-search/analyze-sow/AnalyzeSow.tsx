@@ -21,6 +21,16 @@ const AnalyzeSow = () => {
     temperature: '0.7', // Default to 0.7 as per request body example
   };
 
+  // Supported MIME types for validation
+  const SUPPORTED_MIME_TYPES = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ];
+
+  // Supported file extensions for the accept attribute
+  const SUPPORTED_FILE_EXTENSIONS = '.pdf,.doc,.docx';
+
   const validationSchema = Yup.object({
     existing_files: Yup.array()
       .of(
@@ -28,8 +38,8 @@ const AnalyzeSow = () => {
           .test('fileSize', 'File too large (max 5MB)', (value) =>
             value ? value.size <= 5 * 1024 * 1024 : true
           )
-          .test('fileType', 'Only PDF files are supported', (value) =>
-            value ? ['application/pdf'].includes(value.type) : true
+          .test('fileType', 'Only PDF and Word documents are supported', (value) =>
+            value ? SUPPORTED_MIME_TYPES.includes(value.type) : true
           )
       )
       .min(1, 'At least one existing file is required')
@@ -39,8 +49,8 @@ const AnalyzeSow = () => {
       .test('fileSize', 'File too large (max 5MB)', (value) =>
         value ? value.size <= 5 * 1024 * 1024 : true
       )
-      .test('fileType', 'Only PDF files are supported', (value) =>
-        value ? ['application/pdf'].includes(value.type) : true
+      .test('fileType', 'Only PDF and Word documents are supported', (value) =>
+        value ? SUPPORTED_MIME_TYPES.includes(value.type) : true
       ),
     temperature: Yup.string()
       .matches(/^-?\d*\.?\d+$/, 'Must be a number')
@@ -165,7 +175,7 @@ const AnalyzeSow = () => {
                   file:text-sm file:font-semibold
                   file:bg-blue-50 file:text-blue-700
                   hover:file:bg-blue-100"
-                accept=".pdf"
+                accept={SUPPORTED_FILE_EXTENSIONS}
               />
               {formik.values.existing_files.length > 0 && (
                 <div className="mt-2">
@@ -208,7 +218,7 @@ const AnalyzeSow = () => {
                   file:text-sm file:font-semibold
                   file:bg-blue-50 file:text-blue-700
                   hover:file:bg-blue-100"
-                accept=".pdf"
+                accept={SUPPORTED_FILE_EXTENSIONS}
               />
               {formik.touched.new_file && formik.errors.new_file && (
                 <div className="text-red-500 text-sm mt-1">{String(formik.errors.new_file)}</div>
