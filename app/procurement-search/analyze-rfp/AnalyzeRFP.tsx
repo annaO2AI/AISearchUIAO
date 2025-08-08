@@ -152,7 +152,7 @@ const AnalyzeRFP = () => {
 
   return (
     <div className="max-w-4xl mx-auto ">
-      <h2 className="text-xl font-bold mb-6 mt-8 ">File Upload</h2>
+      <h2 className="text-xl font-bold mb-6 mt-8 ">Analyze Rfp</h2>
       <div className='p-12 bg-white rounded-lg shadow-md'>
         <form onSubmit={formik.handleSubmit} className="space-y-4">
           {/* Existing Files */}

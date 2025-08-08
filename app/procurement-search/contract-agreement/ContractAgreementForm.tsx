@@ -109,7 +109,7 @@ export default function DocumentGeneratorForm() {
 
   return (
     <div className='max-w-4xl mx-auto pt-12 mb-16'>
-      <h1 className="text-2xl font-bold mb-6 pt-6 mt-6">Document Generator</h1>
+      <h1 className="text-2xl font-bold mb-6 pt-6 mt-6">Contract Agreement</h1>
       <div className="p-12 bg-white rounded-lg shadow-md mt-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Document Type and Temperature */}
