@@ -61,6 +61,7 @@ export default function DocumentGeneratorForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
   const [response, setResponse] = useState<ApiResponse | null>(null);
+ const BASE_API_URL= "https://procuremindai-hvf9hxhbhfgvaaa7.centralindia-01.azurewebsites.net";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -489,14 +490,14 @@ export default function DocumentGeneratorForm() {
               <h2 className="text-xl font-bold text-gray-800">{response.message}</h2>
               <div className="flex space-x-3">
                 <a
-                  href={response.docx_download_url}
+                  href={`${BASE_API_URL}${response.docx_download_url}`}
                   download
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
                 >
                   Download DOCX
                 </a>
                 <a
-                  href={response.pdf_download_url}
+                  href={`${BASE_API_URL}${response.pdf_download_url}`}
                   download
                   className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
                 >
