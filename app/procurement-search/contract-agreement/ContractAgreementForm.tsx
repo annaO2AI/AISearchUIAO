@@ -506,7 +506,7 @@ export default function DocumentGeneratorForm() {
             </div>
 
             <div className="p-4 bg-white rounded-md border overflow-auto max-h-[500px]">
-              <div className="prose max-w-none">
+              <div className="prose max-w-none procruement-search-chat">
                 <ReactMarkdown>{response.markdown}</ReactMarkdown>
               </div>
             </div>
