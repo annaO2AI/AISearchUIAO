@@ -5,16 +5,24 @@ import ReactMarkdown from 'react-markdown';
 type FormData = {
   doc_type: string;
   company_name: string;
+  company_address: string,
+  company_state: string,
+  company_country: string,
   client_name: string;
+  client_address: string;
+  client_state:string;
+  client_country:string;
   services: string;
+  effective_date: string;
+  payment: string;
   start_date: string;
   end_date: string;
   termination: string;
-  confidentiality: string;
-  signer_1: string;
-  title_1: string;
-  signer_2: string;
-  title_2: string;
+  // confidentiality: string;
+  // signer_1: string;
+  // title_1: string;
+  // signer_2: string;
+  // title_2: string;
   temperature: number;
 };
 
@@ -29,16 +37,24 @@ export default function DocumentGeneratorForm() {
   const [formData, setFormData] = useState<FormData>({
     doc_type: '',
     company_name: '',
+    company_address: '',
+    company_state:'',
+    company_country:'',
     client_name: '',
+    client_address: '',
+    client_state:'',
+    client_country:'',
     services: '',
+    payment: '',
+    effective_date:'',
     start_date: '',
     end_date: '',
     termination: '',
-    confidentiality: '',
-    signer_1: '',
-    title_1: '',
-    signer_2: '',
-    title_2: '',
+    // confidentiality: '',
+    // signer_1: '',
+    // title_1: '',
+    // signer_2: '',
+    // title_2: '',
     temperature: 0.7
   });
 
@@ -135,6 +151,7 @@ export default function DocumentGeneratorForm() {
           </div>
 
           {/* Company and Client Information */}
+           <h2 className="text-lg font-semibold mb-3">Company Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -150,23 +167,108 @@ export default function DocumentGeneratorForm() {
                 className="w-full rounded border border-gray-300 p-2"
               />
             </div>
-
             <div>
-              <label htmlFor="client_name" className="block text-sm font-medium text-gray-700 mb-1">
-                Client Name *
+              <label htmlFor="company_address" className="block text-sm font-medium text-gray-700 mb-1">
+                Company Address*
               </label>
               <input
                 type="text"
-                id="client_name"
-                name="client_name"
-                value={formData.client_name}
+                id="company_address"
+                name="company_address"
+                value={formData.company_address}
+                onChange={handleChange}
+                required
+                className="w-full rounded border border-gray-300 p-2"
+              />
+            </div>
+            <div>
+              <label htmlFor="company_state" className="block text-sm font-medium text-gray-700 mb-1">
+                Company State*
+              </label>
+              <input
+                type="text"
+                id="company_state"
+                name="company_state"
+                value={formData.company_state}
+                onChange={handleChange}
+                required
+                className="w-full rounded border border-gray-300 p-2"
+              />
+            </div>
+            <div>
+              <label htmlFor="company_country" className="block text-sm font-medium text-gray-700 mb-1">
+                Company Country*
+              </label>
+              <input
+                type="text"
+                id="company_country"
+                name="company_country"
+                value={formData.company_country}
                 onChange={handleChange}
                 required
                 className="w-full rounded border border-gray-300 p-2"
               />
             </div>
           </div>
-
+          <h2 className="text-lg font-semibold mb-3">Client Information</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="client_name" className="block text-sm font-medium text-gray-700 mb-1">
+                  Client Name *
+                </label>
+                <input
+                  type="text"
+                  id="client_name"
+                  name="client_name"
+                  value={formData.client_name}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded border border-gray-300 p-2"
+                />
+              </div>
+              <div>
+                <label htmlFor="client_address" className="block text-sm font-medium text-gray-700 mb-1">
+                  Client Address *
+                </label>
+                <input
+                  type="text"
+                  id="client_address"
+                  name="client_address"
+                  value={formData.client_address}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded border border-gray-300 p-2"
+                />
+              </div>
+              <div>
+                <label htmlFor="client_state" className="block text-sm font-medium text-gray-700 mb-1">
+                  Client State*
+                </label>
+                <input
+                  type="text"
+                  id="client_state"
+                  name="client_state"
+                  value={formData.client_state}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded border border-gray-300 p-2"
+                />
+              </div>
+              <div>
+                <label htmlFor="client_country" className="block text-sm font-medium text-gray-700 mb-1">
+                  Client Country*
+                </label>
+                <input
+                  type="text"
+                  id="client_country"
+                  name="client_country"
+                  value={formData.client_country}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded border border-gray-300 p-2"
+                />
+              </div>
+          </div>
           {/* Services */}
           <div>
             <label htmlFor="services" className="block text-sm font-medium text-gray-700 mb-1">
@@ -183,8 +285,86 @@ export default function DocumentGeneratorForm() {
             />
           </div>
 
-          {/* Dates */}
+          {/* payment  */}
+          <div>
+            <label htmlFor="Payment" className="block text-sm font-medium text-gray-700 mb-1">
+              Payment  *
+            </label>
+            <textarea
+              id="payment"
+              name="payment"
+              value={formData.payment }
+              onChange={handleChange}
+              required
+              rows={4}
+              className="w-full rounded border border-gray-300 p-2"
+            />
+          </div>
+           {/* Terms  */}
+          <div>
+            <label htmlFor="termination" className="block text-sm font-medium text-gray-700 mb-1">
+              termination  *
+            </label>
+            <textarea
+              id="termination"
+              name="termination"
+              value={formData.termination }
+              onChange={handleChange}
+              required
+              rows={4}
+              className="w-full rounded border border-gray-300 p-2"
+            />
+          </div>
+
+         {/* Terms */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* <div>
+              <label htmlFor="termination" className="block text-sm font-medium text-gray-700 mb-1">
+                Termination Terms *
+              </label>
+              <input
+                type="text"
+                id="termination"
+                name="termination"
+                value={formData.termination}
+                onChange={handleChange}
+                required
+                className="w-full rounded border border-gray-300 p-2"
+              />
+            </div> */}
+
+            {/* <div>
+              <label htmlFor="confidentiality" className="block text-sm font-medium text-gray-700 mb-1">
+                Confidentiality Terms *
+              </label>
+              <input
+                type="text"
+                id="confidentiality"
+                name="confidentiality"
+                value={formData.confidentiality}
+                onChange={handleChange}
+                required
+                className="w-full rounded border border-gray-300 p-2"
+              />
+            </div> */}
+          </div>
+          
+          {/* Dates */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+             <div>
+              <label htmlFor="effective_date" className="block text-sm font-medium text-gray-700 mb-1">
+                Effective Date  *
+              </label>
+              <input
+                type="date"
+                id="effective_date"
+                name="effective_date"
+                value={formData.effective_date }
+                onChange={handleChange}
+                required
+                className="w-full rounded border border-gray-300 p-2"
+              />
+            </div>
             <div>
               <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 mb-1">
                 Start Date *
@@ -214,42 +394,12 @@ export default function DocumentGeneratorForm() {
                 className="w-full rounded border border-gray-300 p-2"
               />
             </div>
+            
           </div>
 
-          {/* Terms */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="termination" className="block text-sm font-medium text-gray-700 mb-1">
-                Termination Terms *
-              </label>
-              <input
-                type="text"
-                id="termination"
-                name="termination"
-                value={formData.termination}
-                onChange={handleChange}
-                required
-                className="w-full rounded border border-gray-300 p-2"
-              />
-            </div>
+         
 
-            <div>
-              <label htmlFor="confidentiality" className="block text-sm font-medium text-gray-700 mb-1">
-                Confidentiality Terms *
-              </label>
-              <input
-                type="text"
-                id="confidentiality"
-                name="confidentiality"
-                value={formData.confidentiality}
-                onChange={handleChange}
-                required
-                className="w-full rounded border border-gray-300 p-2"
-              />
-            </div>
-          </div>
-
-          {/* Signers */}
+          {/* Signers
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="border p-4 rounded">
               <h3 className="font-medium mb-3">Company Representative</h3>
@@ -314,9 +464,7 @@ export default function DocumentGeneratorForm() {
                 />
               </div>
             </div>
-          </div>
-
-          {/* Submit Button */}
+          </div>*/}
           <div>
             <button
               type="submit"
@@ -325,15 +473,14 @@ export default function DocumentGeneratorForm() {
             >
               {isSubmitting ? 'Generating...' : 'Generate Document'}
             </button>
-          </div>
+          </div> 
 
-          {/* Submission Message */}
           {submitMessage && (
             <div className={`mt-4 p-3 rounded text-center ${submitMessage.includes('Error') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
               {submitMessage}
             </div>
           )}
-        </form>
+        </form> 
 
         {/* Response Display */}
         {response && (
@@ -359,7 +506,7 @@ export default function DocumentGeneratorForm() {
             </div>
 
             <div className="p-4 bg-white rounded-md border overflow-auto max-h-[500px]">
-              <div className="prose max-w-none">
+              <div className="prose max-w-none procruement-search-chat">
                 <ReactMarkdown>{response.markdown}</ReactMarkdown>
               </div>
             </div>

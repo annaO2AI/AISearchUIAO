@@ -263,7 +263,7 @@ const AnalyzeRFP = () => {
         {analysisResult && (
           <div className="mt-8 p-6 rounded-lg">
             <h3 className="text-lg font-semibold mb-4">Analysis Result</h3>
-            <div className="prose max-w-none">
+            <div className="prose max-w-none procruement-search-chat">
               <ReactMarkdown>{analysisResult}</ReactMarkdown>
             </div>
           </div>
