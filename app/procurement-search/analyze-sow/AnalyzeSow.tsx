@@ -155,7 +155,7 @@ const AnalyzeSow = () => {
 
   return (
     <div className="max-w-4xl mx-auto ">
-      <h2 className="text-xl font-bold mt-10 mb-4">Analyze Sow</h2>
+      <h2 className="text-xl font-bold mt-10 mb-4">Analyze SOW</h2>
       <div className="p-12 bg-white rounded-lg shadow-md">
           <form onSubmit={formik.handleSubmit} className="space-y-4">
             {/* Existing Files */}
