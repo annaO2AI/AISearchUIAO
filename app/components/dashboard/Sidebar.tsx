@@ -30,7 +30,7 @@ const menuItems = [
           { label: "Service Agreement", href: "/procurement-search/master-service-agreement", icon: ArroTabIcon },
           { label: "Contract Agreement", href: "/procurement-search/contract-agreement", icon: ArroTabIcon },
           { label: "Analyze RFP", href: "/procurement-search/analyze-rfp", icon: ArroTabIcon },
-          { label: "analyze SOW", href: "/procurement-search/analyze-sow", icon: ArroTabIcon },
+          { label: "Analyze SOW", href: "/procurement-search/analyze-sow", icon: ArroTabIcon },
         ],
       },
       { label: "Finance Search", href: "/", icon: ArroTabIcon },
