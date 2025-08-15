@@ -53,10 +53,11 @@ export const API_ROUTES = {
 
    //procurement-search
    querySow: `${API_BASE_URL_PROCUREMENT_SEARCH}/query`,
-   analyzeSow: `${API_BASE_URL_PROCUREMENT_SEARCH}/analyze_sow`,
-   analyzeRFP: `${API_BASE_URL_PROCUREMENT_SEARCH}/analyze_rfp`,
+   analyzeSow: `${API_BASE_URL_PROCUREMENT_SEARCH}analyze/sow/compare`,
+   analyzeRFP: `${API_BASE_URL_PROCUREMENT_SEARCH}analyze/rfp/compare`,
    generateMsa: `${API_BASE_URL_PROCUREMENT_SEARCH}/generate_msa`,
    generateBaaSow : `${API_BASE_URL_PROCUREMENT_SEARCH}/generate_baa_sow`,
-
+   summarizeRFP: `${API_BASE_URL_PROCUREMENT_SEARCH}analyze/rfp/summarize`,
+   summarizeSow: `${API_BASE_URL_PROCUREMENT_SEARCH}analyze/sow/summarize`,
 
 }
