@@ -71,7 +71,7 @@ type ResumeData = {
   resume_url?: string;
 };
 
-function formatResumeData(resumeArray: ResumeData[]): string {
+function formatResumeData(resumeArray: ResumeData[]) {
   return resumeArray.map((resume: ResumeData) => {
     let formatted = `**${resume.name}**\n\n`;
 
@@ -79,26 +79,14 @@ function formatResumeData(resumeArray: ResumeData[]): string {
       formatted += `**Summary:**\n${resume.content}\n\n`;
     }
 
-    formatted += formatResumeUrl(resume.resume_url);
-
+if (resume.resume_url?.startsWith('http')) {
+  formatted += `**Resume:** <a href="${resume.resume_url}" target="_blank" style="color: #007bff; text-decoration: underline; rel="noopener noreferrer">View Resume</a>\n`;
+} else {
+  formatted += `**Resume:** Not provided\n`;
+}
     return formatted;
   }).join('\n---\n\n');
 }
-
-const formatResumeUrl = (url: string | undefined): string => {
-  if (!url) return `**Resume:** Not provided\n`;
-  
-  try {
-    const parsedUrl = new URL(url);
-    if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-      return `**Resume:** <a href="${url}" target="_blank" style="color: #007bff; text-decoration: underline; rel="noopener noreferrer">View Resume</a>\n`;
-    }
-  } catch (e) {
-    // Not a valid URL
-  }
-  
-  return `**Resume:** Not provided\n`;
-};
 
 export default function Aisearch({ onSend }: { onSend: () => void }) {
    const abortControllerRef = useRef<AbortController | null>(null);
