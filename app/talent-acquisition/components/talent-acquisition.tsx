@@ -79,11 +79,6 @@ function formatResumeData(resumeArray: ResumeData[]) {
       formatted += `**Summary:**\n${resume.content}\n\n`;
     }
 
-if (resume.resume_url?.startsWith('http')) {
-  formatted += `**Resume:** <a href="${resume.resume_url}" target="_blank" style="color: #007bff; text-decoration: underline; rel="noopener noreferrer">View Resume</a>\n`;
-} else {
-  formatted += `**Resume:** Not provided\n`;
-}
     return formatted;
   }).join('\n---\n\n');
 }
