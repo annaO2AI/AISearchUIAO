@@ -256,7 +256,7 @@ const CompareRFPs = ({ setErrorMessage }: { setErrorMessage: (message: string | 
               <div className="osubtitle mb-6">*.PDF, *.DOC format are supported. Max 10 MB</div>
             </div>
             {analyzeFormik.values.existing_files.length > 0 && (
-              <div className="mt-2">
+              <div className="mt-2 flex flex-col gap-2">
                 {analyzeFormik.values.existing_files.map((file, index) => (
                   <div key={index} className="flex items-center gap-3 bg-[#3C77EF] p-6 rounded-lg">
                     <div>
@@ -282,7 +282,7 @@ const CompareRFPs = ({ setErrorMessage }: { setErrorMessage: (message: string | 
                     <button
                       type="button"
                       onClick={() => removeExistingFile(index)}
-                      className="text-white px-5 py-1 text-sm rounded"
+                      className="text-white px-5 py-1 text-[20px] rounded"
                     >
                       ×
                     </button>

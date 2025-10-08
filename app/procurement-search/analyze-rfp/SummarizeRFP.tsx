@@ -166,7 +166,7 @@ const SummarizeRFP = ({ setErrorMessage }: { setErrorMessage: (message: string |
               </div>
             )}
           {summarizeFormik.values.file && (
-            <div className="flex items-center gap-3 mb-2 bg-[#3C77EF] p-6 rounded-lg">
+            <div className="flex items-center gap-3 mb-2 bg-[#3C77EF] p-6 rounded-lg mt-2">
                 <div className="">
                     <svg width="38" height="43" viewBox="0 0 38 43" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M28.3477 0.240234V9.36873H37.4761L28.3477 0.240234Z" fill="white"/>

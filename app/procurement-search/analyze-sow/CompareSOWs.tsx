@@ -267,7 +267,7 @@ const CompareSOWs = () => {
                         </div>
                         
                         {analyzeFormik.values.existing_files.length > 0 && (
-                            <div className="mt-2">
+                             <div className="mt-2 flex flex-col gap-2">
                                 {analyzeFormik.values.existing_files.map((file, index) => (
                                     <div key={index} className="flex items-center gap-3 bg-[#3C77EF] p-6 rounded-lg">
                                         <div>
