@@ -27,8 +27,31 @@ const menuItems = [
         href: "/procurement-search",
         icon: ArroTabIcon,
         subItems: [
-          { label: "Service Agreement", href: "/procurement-search/master-service-agreement", icon: ArroTabIcon },
-          { label: "Contract Agreement", href: "/procurement-search/contract-agreement", icon: ArroTabIcon },
+          {
+            label: "Agreements",
+            href: "/procurement-search",
+            icon: ArroTabIcon,
+            subItems: [
+              {
+                label: "Service Agreement",
+                href: "/procurement-search/master-service-agreement",
+                icon: ArroTabIcon,
+                subItems: [
+                  { label: "MSA Details", href: "/procurement-search/master-service-agreement/details", icon: ArroTabIcon },
+                  { label: "MSA Terms", href: "/procurement-search/master-service-agreement/terms", icon: ArroTabIcon },
+                ],
+              },
+              {
+                label: "Contract Agreement",
+                href: "/procurement-search/contract-agreement",
+                icon: ArroTabIcon,
+                subItems: [
+                  { label: "Contract Details", href: "/procurement-search/contract-agreement/details", icon: ArroTabIcon },
+                  { label: "Contract Terms", href: "/procurement-search/contract-agreement/terms", icon: ArroTabIcon },
+                ],
+              },
+            ],
+          },
           { label: "Analyze RFP", href: "/procurement-search/analyze-rfp", icon: ArroTabIcon },
           { label: "Analyze SOW", href: "/procurement-search/analyze-sow", icon: ArroTabIcon },
         ],
@@ -153,24 +176,51 @@ export default function Sidebar({
                     <div
                       className={clsx(
                         "overflow-hidden transition-all duration-300",
-                        openMenu === menu.id ? "max-h-60" : "max-h-0"
+                        openMenu === menu.id ? "max-h-80" : "max-h-0"
                       )}
                     >
                       {subItem.subItems.map((nestedItem) => (
-                        <a
-                          key={nestedItem.label}
-                          href={nestedItem.href}
-                          onClick={handleSubItemClick}
-                          className="flex block px-8 py-4 hover:bg-gray-200 gap-3 bg-gray-50 min-w-[20px]"
-                        >
-                          {isExpanded ? (
-                            <>
-                              <nestedItem.icon width={20} className="min-w-[20px]" /> {nestedItem.label}
-                            </>
-                          ) : (
-                            <nestedItem.icon width={20} className="min-w-[20px]" />
+                        <div key={nestedItem.label}>
+                          <a
+                            href={nestedItem.href}
+                            onClick={handleSubItemClick}
+                            className="flex block px-6 py-4 hover:bg-gray-200 gap-3 bg-gray-50 min-w-[20px]"
+                          >
+                            {isExpanded ? (
+                              <>
+                                <nestedItem.icon width={20} className="min-w-[20px]" /> {nestedItem.label}
+                              </>
+                            ) : (
+                              <nestedItem.icon width={20} className="min-w-[20px]" />
+                            )}
+                          </a>
+                          {/* Render third-level subitems for Agreements */}
+                          {nestedItem.subItems && openMenu === menu.id && (
+                            <div
+                              className={clsx(
+                                "overflow-hidden transition-all duration-300",
+                                openMenu === menu.id ? "max-h-80" : "max-h-0"
+                              )}
+                            >
+                              {nestedItem.subItems.map((thirdLevelItem) => (
+                                <a
+                                  key={thirdLevelItem.label}
+                                  href={thirdLevelItem.href}
+                                  onClick={handleSubItemClick}
+                                  className="flex block px-8 py-4 hover:bg-gray-200 gap-3 bg-gray-25 min-w-[20px]"
+                                >
+                                  {isExpanded ? (
+                                    <>
+                                      <thirdLevelItem.icon width={20} className="min-w-[20px]" /> {thirdLevelItem.label}
+                                    </>
+                                  ) : (
+                                    <thirdLevelItem.icon width={20} className="min-w-[20px]" />
+                                  )}
+                                </a>
+                              ))}
+                            </div>
                           )}
-                        </a>
+                        </div>
                       ))}
                     </div>
                   )}

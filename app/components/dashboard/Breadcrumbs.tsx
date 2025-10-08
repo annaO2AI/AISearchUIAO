@@ -40,10 +40,10 @@ export default function Breadcrumbs({ sidebarOpen }: HeaderProps) {
 
   return (
     <div className={clsx(
-                "header-widthfix w-full mt-12 mx-auto bradcurame-section", 
+                "w-[80%] mt-12 mx-auto bradcurame-section", 
                 sidebarOpen
-                  ? "pl-[280px]"
-                  : pathname === "/" || pathname === "/aiops" || pathname === "/talent-acquisition" || pathname === "/human-resources"
+                  ? "pl-[290px]"
+                  : pathname === "/" || pathname === "/aiops" || pathname === "/talent-acquisition" || pathname === "/human-resources" || pathname === "/procurement-search/analyze-rfp"
                   ? "pl-[80px]"
                   : "w-full"
               )}

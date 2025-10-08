@@ -55,13 +55,13 @@ export default function HeaderAISearch({ sidebarOpen }: HeaderProps) {
               ? "shadow-md border-b border-white/30"
               : "border-b border-white/10",
             sidebarOpen
-              ? "pl-[240px]"
-              : pathname === "/" || pathname === "/aiops" || pathname === "/talent-acquisition" || pathname === "/human-resources"
-              ? "pl-[0]"
+              ? "pl-[290px]"
+              : pathname === "/" || pathname === "/aiops" || pathname === "/talent-acquisition" || pathname === "/human-resources" || pathname === "/procurement-search/analyze-rfp"
+              ? "pl-[80]"
               : "w-full"
           )}
         >
-      <div className="w-full header-widthfix mx-auto px-4 flex items-center justify-between">
+      <div className="w-[80%] mx-auto px-4 flex items-center justify-between">
           <div>
             <Image
             src="/Otow-log.svg"

@@ -245,5 +245,63 @@ body {
     margin-top: 10px;
     margin-bottom: 10px;
   }
-
+  .inputdesign{
+    border: 1px dotted #407BFF;
+    background-color: #407cff09;
+  }
+  .inputdesign-new{
+    border: 1px dotted #8337D4;
+    background-color: #8337d409;
+  }
+  .bluebtn-custome{
+    background-color: #407cff17;
+    border: 1px solid #407cff2d;
+    color:#407BFF;
+    height: 50px;
+    width: 184px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .bluebtn-custome:hover{
+    background-color:#407BFF ;
+    color:#fff;
+  }
+  
+  .bluebtn-custome-new{
+    background-color: #8337D417;
+    border: 1px solid #8337D42d;
+    color:#8337D4;
+    height: 50px;
+    width: 184px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .bluebtn-custome-new:hover{
+    background-color:#8337D4 ;
+    color:#fff;
+  }
+  .CompareIcon{
+    right: -56px;
+    top: 40%;
+    z-index: 9;
+    background-color: #fff;
+    padding: 10PX;
+    height: 100PX;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    border-radius: 100px;
+    box-shadow: 1px 1px 20px #0a0a0a33;
+  }
 }
