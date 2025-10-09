@@ -409,7 +409,7 @@ const CompareSOWs = () => {
                 <div className="flex mt-16 mb-12">
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white py-4 px-4 rounded hover:bg-blue-700 disabled:bg-blue-300 w-[250px] m-auto"
+                        className="bg-blue-600 text-white py-4 px-4 rounded hover:bg-blue-700 disabled:bg-blue-300 w-[250px] m-auto"
                         disabled={analyzeFormik.isSubmitting}
                     >
                         {analyzeFormik.isSubmitting ? "Comparing..." : "Compare SOWs"}
