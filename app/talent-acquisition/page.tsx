@@ -29,11 +29,12 @@ export default function TalentAcquisitionPage() {
   const sidebarWidth = isSidebarExpanded ? 256 : 64;
 
   // Show sidebar on the talent-acquisition page
-   const showSidebar =  pathname === "/talent-acquisition" ;
+   const showSidebar =  pathname === "/talent-acquisition" ||  pathname === "/";
 
   return (
     <DashboardProvider>
       <div className="flex overflow-hidden">
+        <div className="bg-red-600">
         {showSidebar && (
           <Sidebar
             collapsed={collapsed}
@@ -42,8 +43,10 @@ export default function TalentAcquisitionPage() {
             setHovered={setHovered}
           />
         )}
+         </div>
         <HeaderAISearch sidebarOpen={showSidebar && isSidebarExpanded} />
-         <Breadcrumbs sidebarOpen={showSidebar && isSidebarExpanded} />
+        <Breadcrumbs sidebarOpen={showSidebar && isSidebarExpanded} />
+        
         <div
           className="flex flex-col flex-1 transition-all duration-300 ease-in-out"
           style={{ marginLeft: showSidebar ? sidebarWidth : 0 }}

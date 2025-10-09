@@ -135,7 +135,7 @@ const ProfileCard: React.FC = () => {
             <p className="text-lg font-semibold text-gray-800">{firstName}</p>
           </div>
         </div>
-        <div className="w-[75%]">
+        <div className="w-[80%]">
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
               <p className="text-gray-500">First name</p>

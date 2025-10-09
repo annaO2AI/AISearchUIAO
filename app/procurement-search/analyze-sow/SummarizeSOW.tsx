@@ -196,6 +196,25 @@ const SummarizeSOW = () => {
                           </div>
                       </div>
                   )}
+                  <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Table of Contents Hint
+                    </label>
+                    <input
+                      type="text"
+                      name="toc_hint"
+                      value={summarizeFormik.values.toc_hint}
+                      onChange={summarizeFormik.handleChange}
+                      onBlur={summarizeFormik.handleBlur}
+                      className="block w-full text-sm text-gray-700 border border-gray-300 rounded py-2 px-3"
+                      placeholder="Enter TOC hint to help with summarization"
+                    />
+                    {summarizeFormik.touched.toc_hint && summarizeFormik.errors.toc_hint && (
+                      <div className="text-red-500 text-sm mt-1">
+                        {summarizeFormik.errors.toc_hint}
+                      </div>
+                    )}
+                </div>
               </div>
               {/* <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -218,25 +237,7 @@ const SummarizeSOW = () => {
             )}
         </div> */}
 
-              {/* <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Table of Contents Hint
-          </label>
-          <input
-            type="text"
-            name="toc_hint"
-            value={summarizeFormik.values.toc_hint}
-            onChange={summarizeFormik.handleChange}
-            onBlur={summarizeFormik.handleBlur}
-            className="block w-full text-sm text-gray-700 border border-gray-300 rounded py-2 px-3"
-            placeholder="Enter TOC hint to help with summarization"
-          />
-          {summarizeFormik.touched.toc_hint && summarizeFormik.errors.toc_hint && (
-            <div className="text-red-500 text-sm mt-1">
-              {summarizeFormik.errors.toc_hint}
-            </div>
-          )}
-        </div> */}
+        
 
               {errorMessage && (
                   <div className="text-red-500 text-sm mt-2">{errorMessage}</div>
@@ -244,7 +245,7 @@ const SummarizeSOW = () => {
             <div className="flex m-6">
               <button
                   type="submit"
-                  className="w-full bg-blue-600 text-white py-4 px-4 rounded hover:bg-blue-700 disabled:bg-blue-300 w-[250px] m-auto"
+                  className=" bg-blue-600 text-white py-4 px-4 rounded hover:bg-blue-700 disabled:bg-blue-300 w-[250px] m-auto"
                   disabled={summarizeFormik.isSubmitting}
               >
                   {summarizeFormik.isSubmitting ? "Summarizing..." : "Summarize SOW"}

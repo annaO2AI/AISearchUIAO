@@ -40,13 +40,13 @@ export default function Breadcrumbs({ sidebarOpen }: HeaderProps) {
 
   return (
     <div className={clsx(
-                "w-[80%] mt-12 mx-auto bradcurame-section", 
-                sidebarOpen
-                  ? "pl-[290px]"
-                  : pathname === "/" || pathname === "/aiops" || pathname === "/talent-acquisition" || pathname === "/human-resources" || pathname === "/procurement-search/analyze-rfp"
-                  ? "pl-[80px]"
-                  : "w-full"
-              )}
+            "w-[80%] mt-12 mx-auto bradcurame-section", 
+            sidebarOpen
+            ? "pl-[210px]"
+            : pathname === "/" || pathname === "/aiops" || pathname === "/talent-acquisition" || pathname === "/human-resources" || pathname === "/procurement-search/analyze-rfp" || pathname === "/procurement-search/analyze-sow" || pathname === "/procurement-search/contract-agreement" || pathname === "/procurement-search/master-service-agreement" 
+            ? "pl-[24px]"
+            : "w-full"
+      )}
     >
       <nav className="flex py-2 px-4 mt-8 w-[100%]">
         {breadcrumbs.map((crumb, index) => (

@@ -55,7 +55,7 @@ export default function HeaderAISearch({ sidebarOpen }: HeaderProps) {
               ? "shadow-md border-b border-white/30"
               : "border-b border-white/10",
             sidebarOpen
-              ? "pl-[290px]"
+              ? "pl-[210px]"
               : pathname === "/" || pathname === "/aiops" || pathname === "/talent-acquisition" || pathname === "/human-resources" || pathname === "/procurement-search/analyze-rfp"
               ? "pl-[80]"
               : "w-full"
@@ -72,14 +72,14 @@ export default function HeaderAISearch({ sidebarOpen }: HeaderProps) {
           />
           </div>
           <nav className="hidden md:flex space-x-3">
-          <Link
+          {/* <Link
             href="/"
             className={`transition ${
               pathname === "/" ? "ot-title font-semibold activenavigation py-2 px-4 rounded-md" : "text-gray-700 hover:ot-title py-2 px-4 rounded-md"
             }`}
           >
             AI ChatBot
-          </Link>
+          </Link> */}
           {/* <Link
             href="/about"
             className={`transition ${

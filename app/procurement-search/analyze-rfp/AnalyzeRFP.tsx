@@ -8,7 +8,7 @@ const AnalyzeRFP = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   return (
-    <div className="w-[75%] mx-auto">
+    <div className="w-[80%] mx-auto">
       <h2 className="text-xl font-bold mt-6 mb-4">Analyze RFP</h2>
       <div className="flex border-b mb-6">
         <button

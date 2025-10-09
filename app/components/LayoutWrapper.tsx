@@ -42,18 +42,17 @@ export default function LayoutWrapper({ children }: { children: ReactNode }) {
   return (
     <DashboardProvider>
       <div className="flex min-h-screen overflow-hidden">
-        {showSidebar && (
+        {/* {showSidebar && (
           <Sidebar
             collapsed={collapsed}
             hovered={hovered}
             toggleSidebar={toggleCollapse}
             setHovered={setHovered}
           />
-        )}
-         <HeaderAISearch sidebarOpen={showSidebar && isSidebarExpanded} />
+        )} */}
+         {/* <HeaderAISearch sidebarOpen={showSidebar && isSidebarExpanded} /> */}
         <div
           className="flex flex-col flex-1 transition-all duration-300 ease-in-out"
-          style={{ marginLeft: showSidebar ? sidebarWidth : 0 }}
         >
           <>
            

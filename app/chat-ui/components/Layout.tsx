@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react"
 import Aisearch from "./Aisearch"
+import TalentAcquisitionPage from "../../talent-acquisition/page"
 
 
 export default function Layout() {
@@ -12,7 +13,7 @@ export default function Layout() {
 
   return (
     <>
-      <Aisearch onSend={handleToggle} />
+      <TalentAcquisitionPage  />
     </>
   )
 }

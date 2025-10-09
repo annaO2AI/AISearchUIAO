@@ -24,12 +24,12 @@ const menuItems = [
       { label: "Talent Acquisition", href: "/talent-acquisition", icon: ArroTabIcon },
       {
         label: "Procurement Search",
-        href: "/procurement-search",
+        href: "/",
         icon: ArroTabIcon,
         subItems: [
           {
             label: "Agreements",
-            href: "/procurement-search",
+            href: "/",
             icon: ArroTabIcon,
             subItems: [
               {
@@ -95,9 +95,9 @@ export default function Sidebar({
 
   const handleSubItemClick = () => {
     // Collapse sidebar only if it's expanded
-    if (isExpanded) {
-      toggleSidebar();
-    }
+    // if (isExpanded) {
+    //   toggleSidebar();
+    // }
   };
 
   return (
