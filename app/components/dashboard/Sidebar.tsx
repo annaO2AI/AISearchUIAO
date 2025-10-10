@@ -57,9 +57,9 @@ const menuItems = [
 
           // { label: "Document Search", href: "/document-search", icon: ArroTabIcon },
           { label: "Generate Service Agreements", href: "/document-search/service-agreement", icon: ArroTabIcon },
-          { label: "Generate SOW & BAA", href: "//document-search/generate-SOW-&-BAA", icon: ArroTabIcon },
+          { label: "Generate SOW & BAA", href: "/document-search/generate-SOW-&-BAA", icon: ArroTabIcon },
           { label: "Analyze RFP", href: "/document-search/analyze-rfp", icon: ArroTabIcon },
-          { label: "Analyze SOW", href: "//document-search/analyze-sow", icon: ArroTabIcon },
+          { label: "Analyze SOW", href: "/document-search/analyze-sow", icon: ArroTabIcon },
         ],
       },
       { label: "Finance Search", href: "/", icon: ArroTabIcon },

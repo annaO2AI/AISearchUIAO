@@ -28,7 +28,7 @@ export default function ProcurementSearchPage() {
   const sidebarWidth = isSidebarExpanded ? 256 : 64;
 
   // Show sidebar on the talent-acquisition page
-   const showSidebar =  pathname === "/procurement-search/generate-SOW-&-BAA";
+   const showSidebar =  pathname === "/document-search/generate-SOW-&-BAA";
 
   return (
     <DashboardProvider>
