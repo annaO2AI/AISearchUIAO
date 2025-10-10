@@ -24,34 +24,40 @@ const menuItems = [
       { label: "Talent Acquisition", href: "/talent-acquisition", icon: ArroTabIcon },
       {
         label: "Procurement Search",
-        href: "/",
+        href: "/procurement-search",
         icon: ArroTabIcon,
         subItems: [
-          {
-            label: "Agreements",
-            href: "/",
-            icon: ArroTabIcon,
-            subItems: [
-              {
-                label: "Service Agreement",
-                href: "/procurement-search/master-service-agreement",
-                icon: ArroTabIcon,
-                subItems: [
-                  { label: "MSA Details", href: "/procurement-search/master-service-agreement/details", icon: ArroTabIcon },
-                  { label: "MSA Terms", href: "/procurement-search/master-service-agreement/terms", icon: ArroTabIcon },
-                ],
-              },
-              {
-                label: "Contract Agreement",
-                href: "/procurement-search/contract-agreement",
-                icon: ArroTabIcon,
-                subItems: [
-                  { label: "Contract Details", href: "/procurement-search/contract-agreement/details", icon: ArroTabIcon },
-                  { label: "Contract Terms", href: "/procurement-search/contract-agreement/terms", icon: ArroTabIcon },
-                ],
-              },
-            ],
-          },
+          //  {
+          //   label: "Document Search",
+          //   href: "/procurement-search",
+          //   icon: ArroTabIcon,
+          //   subItems: [
+          //     { label: "MSA Details", href: "/procurement-search/master-service-agreement/details", icon: ArroTabIcon },
+          //     { label: "MSA Terms", href: "/procurement-search/master-service-agreement/terms", icon: ArroTabIcon },
+          //   ],
+          // },
+          // {
+          //   label: "Generate Service Agreements",
+          //   href: "/procurement-search/master-service-agreement",
+          //   icon: ArroTabIcon,
+          //   subItems: [
+          //     { label: "MSA Details", href: "/procurement-search/master-service-agreement/details", icon: ArroTabIcon },
+          //     { label: "MSA Terms", href: "/procurement-search/master-service-agreement/terms", icon: ArroTabIcon },
+          //   ],
+          // },
+          // {
+          //   label: "3.	Generate SOW & BAA",
+          //   href: "/procurement-search/contract-agreement",
+          //   icon: ArroTabIcon,
+          //   subItems: [
+          //     { label: "Contract Details", href: "/procurement-search/contract-agreement/details", icon: ArroTabIcon },
+          //     { label: "Contract Terms", href: "/procurement-search/contract-agreement/terms", icon: ArroTabIcon },
+          //   ],
+          // },
+
+          { label: "Document Search", href: "/procurement-search", icon: ArroTabIcon },
+          { label: "Generate Service Agreements", href: "/procurement-search/master-service-agreement", icon: ArroTabIcon },
+          { label: "Generate SOW & BAA", href: "/procurement-search/contract-agreement", icon: ArroTabIcon },
           { label: "Analyze RFP", href: "/procurement-search/analyze-rfp", icon: ArroTabIcon },
           { label: "Analyze SOW", href: "/procurement-search/analyze-sow", icon: ArroTabIcon },
         ],
