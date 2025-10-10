@@ -43,7 +43,7 @@ export default function Breadcrumbs({ sidebarOpen }: HeaderProps) {
             "w-[80%] mt-12 mx-auto bradcurame-section", 
             sidebarOpen
             ? "pl-[210px]"
-            : pathname === "/" || pathname === "/aiops" || pathname === "/talent-acquisition" || pathname === "/human-resources" || pathname === "/procurement-search/analyze-rfp" || pathname === "/procurement-search/analyze-sow" || pathname === "/procurement-search/contract-agreement" || pathname === "/procurement-search/master-service-agreement" 
+            : pathname === "/" || pathname === "/aiops" || pathname === "/talent-acquisition" || pathname === "/human-resources" || pathname === "/procurement-search/analyze-rfp" || pathname === "/procurement-search/analyze-sow" || pathname === "/procurement-search/generate-SOW-&-BAA" || pathname === "/procurement-search/service-agreement" 
             ? "pl-[24px]"
             : "w-full"
       )}

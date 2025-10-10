@@ -6,7 +6,7 @@ import Sidebar from "../../components/dashboard/Sidebar";
 import { DashboardProvider } from "../../context/DashboardContext";
 import HeaderAISearch from "../../chat-ui/components/Header";
 import Breadcrumbs from "../../components/dashboard/Breadcrumbs"; // Import Breadcrumbs component
-import ContractAgreementForm from "./ContractAgreementForm";
+import ContractForm from "./ContractForm";
 
 export default function ProcurementSearchPage() {
   const pathname = usePathname();
@@ -28,7 +28,7 @@ export default function ProcurementSearchPage() {
   const sidebarWidth = isSidebarExpanded ? 256 : 64;
 
   // Show sidebar on the talent-acquisition page
-   const showSidebar =  pathname === "/procurement-search/contract-agreement" ;
+   const showSidebar =  pathname === "/procurement-search/service-agreement" || pathname === "/procurement-search"
 
   return (
     <DashboardProvider>
@@ -42,13 +42,13 @@ export default function ProcurementSearchPage() {
           />
         )}
         <HeaderAISearch sidebarOpen={showSidebar && isSidebarExpanded} />
-         <Breadcrumbs sidebarOpen={showSidebar && isSidebarExpanded} />
+        <Breadcrumbs sidebarOpen={showSidebar && isSidebarExpanded} />
         <div
           className="flex flex-col flex-1 transition-all duration-300 ease-in-out"
           style={{ marginLeft: showSidebar ? sidebarWidth : 0 }}
         >
           <main>
-              <ContractAgreementForm />
+              <ContractForm />
           </main>
         </div>
       </div>

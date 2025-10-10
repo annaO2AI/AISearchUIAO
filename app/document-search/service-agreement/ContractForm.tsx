@@ -120,7 +120,7 @@ const ContractForm = () => {
       {/* Form Section */}
       <div className="space-y-4">
         <h1 className="text-2xl font-bold text-gray-800">
-          Create Master Service Agreement
+          Generate Service Agreement
         </h1>
         <form onSubmit={formik.handleSubmit} className="space-y-6">
           {/* Company Information Section */}

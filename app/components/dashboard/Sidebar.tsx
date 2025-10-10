@@ -24,8 +24,7 @@ const menuItems = [
     subItems: [
       { label: "Talent Acquisition", href: "/talent-acquisition", icon: ArroTabIcon },
       {
-        label: "Procurement Search",
-        href: "/procurement-search",
+        label: "Document Search", href: "/document-search",
         icon: ArroTabIcon,
         subItems: [
           //  {
@@ -56,11 +55,11 @@ const menuItems = [
           //   ],
           // },
 
-          { label: "Document Search", href: "/procurement-search", icon: ArroTabIcon },
-          { label: "Generate Service Agreements", href: "/procurement-search/master-service-agreement", icon: ArroTabIcon },
-          { label: "Generate SOW & BAA", href: "/procurement-search/contract-agreement", icon: ArroTabIcon },
-          { label: "Analyze RFP", href: "/procurement-search/analyze-rfp", icon: ArroTabIcon },
-          { label: "Analyze SOW", href: "/procurement-search/analyze-sow", icon: ArroTabIcon },
+          // { label: "Document Search", href: "/document-search", icon: ArroTabIcon },
+          { label: "Generate Service Agreements", href: "/document-search/service-agreement", icon: ArroTabIcon },
+          { label: "Generate SOW & BAA", href: "//document-search/generate-SOW-&-BAA", icon: ArroTabIcon },
+          { label: "Analyze RFP", href: "/document-search/analyze-rfp", icon: ArroTabIcon },
+          { label: "Analyze SOW", href: "//document-search/analyze-sow", icon: ArroTabIcon },
         ],
       },
       { label: "Finance Search", href: "/", icon: ArroTabIcon },
