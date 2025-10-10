@@ -1,3 +1,4 @@
+//Sidebar.tsx
 import {
   HomeIcon,
   BarChart2Icon,
@@ -200,32 +201,6 @@ export default function Sidebar({
                               <nestedItem.icon width={20} className="min-w-[20px]" />
                             )}
                           </a>
-                          {/* Render third-level subitems for Agreements */}
-                          {nestedItem.subItems && openMenu === menu.id && (
-                            <div
-                              className={clsx(
-                                "overflow-hidden transition-all duration-300",
-                                openMenu === menu.id ? "max-h-80" : "max-h-0"
-                              )}
-                            >
-                              {nestedItem.subItems.map((thirdLevelItem) => (
-                                <a
-                                  key={thirdLevelItem.label}
-                                  href={thirdLevelItem.href}
-                                  onClick={handleSubItemClick}
-                                  className="flex block px-8 py-4 hover:bg-gray-200 gap-3 bg-gray-25 min-w-[20px]"
-                                >
-                                  {isExpanded ? (
-                                    <>
-                                      <thirdLevelItem.icon width={20} className="min-w-[20px]" /> {thirdLevelItem.label}
-                                    </>
-                                  ) : (
-                                    <thirdLevelItem.icon width={20} className="min-w-[20px]" />
-                                  )}
-                                </a>
-                              ))}
-                            </div>
-                          )}
                         </div>
                       ))}
                     </div>
