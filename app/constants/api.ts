@@ -5,7 +5,7 @@ const API_BASE_URL =
 
 //ai search
 const API_BASE_URL_AISEARCH =
-  process.env.NEXT_PUBLIC_API_BASE_URL_AISEARCH ||
+  // process.env.NEXT_PUBLIC_API_BASE_URL_AISEARCH ||
   "https://ai-talent-acquisition-api-fne3arcthkbrdbhk.centralus-01.azurewebsites.net/"
 
 //HR search 3.4
