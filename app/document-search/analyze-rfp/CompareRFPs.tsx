@@ -220,7 +220,6 @@ const CompareRFPs = ({ setErrorMessage }: { setErrorMessage: (message: string | 
     return null
   }
 
-  console.log("Analysis Result:", analysisResult)
 
   return (
     <div className="space-y-4">
