@@ -13,7 +13,7 @@ interface FileUploadValues {
 
 interface ComparisonResult {
   ok: boolean
-  comparison_table: {
+  comparison_table: Array<{
     title: string
     left_doc: string
     right_doc: string
@@ -23,7 +23,7 @@ interface ComparisonResult {
       left: string
       right: string
     }>
-  }
+  }>
 }
 
 const SUPPORTED_MIME_TYPES = [
@@ -220,6 +220,8 @@ const CompareRFPs = ({ setErrorMessage }: { setErrorMessage: (message: string | 
     return null
   }
 
+  console.log("Analysis Result:", analysisResult)
+
   return (
     <div className="space-y-4">
       <form onSubmit={analyzeFormik.handleSubmit} className="space-y-4">
@@ -377,37 +379,41 @@ const CompareRFPs = ({ setErrorMessage }: { setErrorMessage: (message: string | 
         </div>
       </form>
 
-      {analysisResult && analysisResult.comparison_table && (
-        <div className="mt-8 p-6 rounded-lg border border-gray-200 bg-white">
-          <h3 className="text-lg font-semibold mb-4">{analysisResult.comparison_table.title}</h3>
-          <div className="mb-4 text-base osubtitle">
-            <p><strong>Document 1:</strong> {analysisResult.comparison_table.left_doc}</p>
-            <p><strong>Document 2:</strong> {analysisResult.comparison_table.right_doc}</p>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full border-collapse border border-gray-200">
-              <thead>
-                <tr className="bg-gray-100">
-                  {analysisResult.comparison_table.columns.map((column, index) => (
-                    <th key={index} className="border border-gray-200 px-4 py-4 text-left text-base font-semibold text-gray-700">
-                      {column}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {analysisResult.comparison_table.rows.map((row, index) => (
-                  <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                    <td className="border border-gray-200 px-4 py-4 text-base  font-semibold">{row.section}</td>
-                    <td className="border border-gray-200 px-4 py-4 text-base ">{row.left}</td>
-                    <td className="border border-gray-200 px-4 py-4 text-base ">{row.right}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+  {analysisResult && analysisResult.comparison_table && analysisResult.comparison_table.length > 0 && (
+  <div className="mt-8 p-6 rounded-lg border border-gray-200 bg-white">
+    {analysisResult.comparison_table.map((table, tableIndex) => (
+      <div key={tableIndex}>
+        <h3 className="text-lg font-semibold mb-4">{table.title}</h3>
+        <div className="mb-4 text-base osubtitle">
+          <p><strong>Document 1:</strong> {table.left_doc}</p>
+          <p><strong>Document 2:</strong> {table.right_doc}</p>
         </div>
-      )}
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse border border-gray-200">
+            <thead>
+              <tr className="bg-gray-100">
+                {table.columns.map((column, index) => (
+                  <th key={index} className="border border-gray-200 px-4 py-4 text-left text-base font-semibold text-gray-700">
+                    {column}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {table.rows.map((row, index) => (
+                <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                  <td className="border border-gray-200 px-4 py-4 text-base font-semibold">{row.section}</td>
+                  <td className="border border-gray-200 px-4 py-4 text-base">{row.left}</td>
+                  <td className="border border-gray-200 px-4 py-4 text-base">{row.right}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
     </div>
   )
 }
