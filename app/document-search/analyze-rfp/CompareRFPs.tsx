@@ -225,7 +225,8 @@ const CompareRFPs = ({ setErrorMessage }: { setErrorMessage: (message: string | 
     <div className="space-y-4">
       <form onSubmit={analyzeFormik.handleSubmit} className="space-y-4">
         <div className="flex gap-3">
-          {/* Existing Files */}
+          {/* Existing Files details*/}
+
           <div className="w-[50%] p-12 bg-white rounded-lg shadow-md border-o2 relative">
             <h3 className="block font-medium text-gray-700 mb-1 text-[20px] mb-3">
               Existing Files *
