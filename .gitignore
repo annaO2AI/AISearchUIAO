@@ -9,8 +9,9 @@
 /coverage
 
 # next.js
-/.next/
-/out/
+.next/
+out/
+build/
 
 # production
 /build
@@ -33,3 +34,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Environment
+.env*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
