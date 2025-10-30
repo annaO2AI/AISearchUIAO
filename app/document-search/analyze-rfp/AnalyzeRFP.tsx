@@ -24,7 +24,7 @@ const AnalyzeRFP = () => {
         <button
           className={`py-4 px-12 font-medium ${
             activeTab === "summarize"
-              ? "text-blue-600 border-b-2 border-blue-600 bg-white shadow-md text-[16px]"
+              ? "text-blue-600 border-b-2 border-blue-600 bg-white shadow-md"
               : "text-gray-500"
           }`}
           onClick={() => setActiveTab("summarize")}
