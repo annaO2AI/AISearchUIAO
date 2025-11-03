@@ -1,11 +1,58 @@
 "use client"
 import { useState } from "react"
+
+interface ComparisonResult {
+  ok: boolean
+  comparison_table: Array<{
+    title: string
+    left_doc: string
+    right_doc: string
+    columns: string[]
+    rows: Array<{
+      section: string
+      left: string
+      right: string
+    }>
+  }>
+}
+
+interface SummarizeResult {
+  ok: boolean
+  filename: string
+  doc_type: string
+  executive_summary: string
+  sections: Array<{
+    title: string
+    summary: string
+  }>
+  docx_download_url?: string
+}
+
+interface FileMetadata {
+  path: string
+  size: string
+  lastModified: string
+}
+
+// Import your actual components
 import CompareRFPs from "./CompareRFPs"
 import SummarizeRFP from "./SummarizeRFP"
 
 const AnalyzeRFP = () => {
   const [activeTab, setActiveTab] = useState<"analyze" | "summarize">("analyze")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  
+  // State for Compare RFPs tab - persists across tab switches
+  const [analysisResult, setAnalysisResult] = useState<ComparisonResult | null>(null)
+  const [compareFileMetadata, setCompareFileMetadata] = useState<Record<string, FileMetadata>>({})
+  const [compareExistingFiles, setCompareExistingFiles] = useState<File[]>([])
+  const [compareNewFile, setCompareNewFile] = useState<File | null>(null)
+  
+  // State for Summarize RFP tab - persists across tab switches
+  const [summarizeResult, setSummarizeResult] = useState<SummarizeResult | null>(null)
+  const [summarizeFileMetadata, setSummarizeFileMetadata] = useState<Record<string, FileMetadata>>({})
+  const [summarizeFile, setSummarizeFile] = useState<File | null>(null)
+  const [summarizeTocHint, setSummarizeTocHint] = useState<string>("")
 
   return (
     <div className="w-[80%] mx-auto">
@@ -37,9 +84,29 @@ const AnalyzeRFP = () => {
           <div className="text-red-500 text-sm mt-2">{errorMessage}</div>
         )}
         {activeTab === "analyze" ? (
-          <CompareRFPs setErrorMessage={setErrorMessage} />
+          <CompareRFPs 
+            setErrorMessage={setErrorMessage}
+            analysisResult={analysisResult}
+            setAnalysisResult={setAnalysisResult}
+            fileMetadata={compareFileMetadata}
+            setFileMetadata={setCompareFileMetadata}
+            existingFiles={compareExistingFiles}
+            setExistingFiles={setCompareExistingFiles}
+            newFile={compareNewFile}
+            setNewFile={setCompareNewFile}
+          />
         ) : (
-          <SummarizeRFP setErrorMessage={setErrorMessage} />
+          <SummarizeRFP 
+            setErrorMessage={setErrorMessage}
+            summarizeResult={summarizeResult}
+            setSummarizeResult={setSummarizeResult}
+            fileMetadata={summarizeFileMetadata}
+            setFileMetadata={setSummarizeFileMetadata}
+            file={summarizeFile}
+            setFile={setSummarizeFile}
+            tocHint={summarizeTocHint}
+            setTocHint={setSummarizeTocHint}
+          />
         )}
       </div>
     </div>

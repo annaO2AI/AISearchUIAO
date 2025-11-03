@@ -1,9 +1,9 @@
 "use client"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import { useState } from "react"
 import Image from 'next/image'
 import { API_ROUTES } from "@/app/constants/api"
+import { useEffect } from "react"
 
 interface FileUploadValues {
   existing_files: File[]
@@ -26,6 +26,24 @@ interface ComparisonResult {
   }>
 }
 
+interface FileMetadata {
+  path: string
+  size: string
+  lastModified: string
+}
+
+interface CompareRFPsProps {
+  setErrorMessage: (message: string | null) => void
+  analysisResult: ComparisonResult | null
+  setAnalysisResult: (result: ComparisonResult | null) => void
+  fileMetadata: Record<string, FileMetadata>
+  setFileMetadata: (metadata: Record<string, FileMetadata>) => void
+  existingFiles: File[]
+  setExistingFiles: (files: File[]) => void
+  newFile: File | null
+  setNewFile: (file: File | null) => void
+}
+
 const SUPPORTED_MIME_TYPES = [
   "application/pdf",
   "application/msword",
@@ -34,10 +52,17 @@ const SUPPORTED_MIME_TYPES = [
 
 const SUPPORTED_FILE_EXTENSIONS = ".pdf,.doc,.docx"
 
-const CompareRFPs = ({ setErrorMessage }: { setErrorMessage: (message: string | null) => void }) => {
-  const [analysisResult, setAnalysisResult] = useState<ComparisonResult | null>(null)
-  const [fileMetadata, setFileMetadata] = useState<Record<string, { path: string; size: string; lastModified: string }>>({})
-
+const CompareRFPs = ({ 
+  setErrorMessage, 
+  analysisResult, 
+  setAnalysisResult,
+  fileMetadata,
+  setFileMetadata,
+  existingFiles,
+  setExistingFiles,
+  newFile,
+  setNewFile
+}: CompareRFPsProps) => {
   const clearFileInput = (elementId: string) => {
     const fileInput = document.getElementById(elementId) as HTMLInputElement
     if (fileInput) {
@@ -46,8 +71,8 @@ const CompareRFPs = ({ setErrorMessage }: { setErrorMessage: (message: string | 
   }
 
   const analyzeInitialValues: FileUploadValues = {
-    existing_files: [],
-    new_file: null,
+    existing_files: existingFiles,
+    new_file: newFile,
     temperature: "0.7",
   }
 
@@ -83,6 +108,7 @@ const CompareRFPs = ({ setErrorMessage }: { setErrorMessage: (message: string | 
   const analyzeFormik = useFormik({
     initialValues: analyzeInitialValues,
     validationSchema: analyzeValidationSchema,
+    enableReinitialize: true, // Important: reinitialize form when props change
     onSubmit: async (values) => {
       setErrorMessage(null)
       const formData = new FormData()
@@ -125,8 +151,11 @@ const CompareRFPs = ({ setErrorMessage }: { setErrorMessage: (message: string | 
           throw new Error("Invalid response format from server")
         }
 
+        // Clear form after successful submission
         analyzeFormik.resetForm()
         setFileMetadata({})
+        setExistingFiles([])
+        setNewFile(null)
         clearFileInput("existing-files-input")
         clearFileInput("new-file-input")
       } catch (error: any) {
@@ -136,6 +165,15 @@ const CompareRFPs = ({ setErrorMessage }: { setErrorMessage: (message: string | 
       }
     },
   })
+
+  // Sync form values with parent state
+  useEffect(() => {
+    setExistingFiles(analyzeFormik.values.existing_files)
+  }, [analyzeFormik.values.existing_files])
+
+  useEffect(() => {
+    setNewFile(analyzeFormik.values.new_file)
+  }, [analyzeFormik.values.new_file])
 
   const handleExistingFilesChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -172,14 +210,14 @@ const CompareRFPs = ({ setErrorMessage }: { setErrorMessage: (message: string | 
     const file = event.target.files?.[0] || null
     if (file) {
       const fullPath = file.webkitRelativePath || file.name
-      setFileMetadata((prev) => ({
-        ...prev,
+      setFileMetadata({
+        ...fileMetadata,
         [file.name]: {
           path: fullPath,
           size: `${(file.size / 1024).toFixed(1)} KB`,
           lastModified: new Date(file.lastModified).toLocaleString(),
         },
-      }))
+      })
     }
     analyzeFormik.setFieldValue("new_file", file)
   }

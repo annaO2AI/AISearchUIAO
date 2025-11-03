@@ -1,7 +1,7 @@
 "use client"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import { useState } from "react"
+import { useEffect } from "react"
 import ReactMarkdown from "react-markdown"
 import { API_ROUTES } from "@/app/constants/api"
 import Image from 'next/image'
@@ -14,7 +14,7 @@ interface SummarizeValues {
 
 interface SummarizeResult {
   ok: boolean
-  filename: string
+filename: string
   doc_type: string
   executive_summary: string
   sections: Array<{
@@ -22,6 +22,24 @@ interface SummarizeResult {
     summary: string
   }>
   docx_download_url?: string
+}
+
+interface FileMetadata {
+  path: string
+  size: string
+  lastModified: string
+}
+
+interface SummarizeRFPProps {
+  setErrorMessage: (message: string | null) => void
+  summarizeResult: SummarizeResult | null
+  setSummarizeResult: (result: SummarizeResult | null) => void
+  fileMetadata: Record<string, FileMetadata>
+  setFileMetadata: (metadata: Record<string, FileMetadata>) => void
+  file: File | null
+  setFile: (file: File | null) => void
+  tocHint: string
+  setTocHint: (hint: string) => void
 }
 
 const SUPPORTED_MIME_TYPES = [
@@ -32,10 +50,17 @@ const SUPPORTED_MIME_TYPES = [
 
 const SUPPORTED_FILE_EXTENSIONS = ".pdf,.doc,.docx"
 
-const SummarizeRFP = ({ setErrorMessage }: { setErrorMessage: (message: string | null) => void }) => {
-  const [summarizeResult, setSummarizeResult] = useState<SummarizeResult | null>(null)
-  const [fileMetadata, setFileMetadata] = useState<Record<string, { path: string; size: string; lastModified: string }>>({})
-
+const SummarizeRFP = ({ 
+  setErrorMessage,
+  summarizeResult,
+  setSummarizeResult,
+  fileMetadata,
+  setFileMetadata,
+  file,
+  setFile,
+  tocHint,
+  setTocHint
+}: SummarizeRFPProps) => {
   const clearFileInput = (elementId: string) => {
     const fileInput = document.getElementById(elementId) as HTMLInputElement
     if (fileInput) {
@@ -44,9 +69,9 @@ const SummarizeRFP = ({ setErrorMessage }: { setErrorMessage: (message: string |
   }
 
   const summarizeInitialValues: SummarizeValues = {
-    file: null,
+    file: file,
     temperature: "0.3",
-    toc_hint: "",
+    toc_hint: tocHint,
   }
 
   const summarizeValidationSchema = Yup.object({
@@ -67,6 +92,7 @@ const SummarizeRFP = ({ setErrorMessage }: { setErrorMessage: (message: string |
   const summarizeFormik = useFormik({
     initialValues: summarizeInitialValues,
     validationSchema: summarizeValidationSchema,
+    enableReinitialize: true, // Important: reinitialize form when props change
     onSubmit: async (values) => {
       setErrorMessage(null)
       setSummarizeResult(null)
@@ -98,8 +124,12 @@ const SummarizeRFP = ({ setErrorMessage }: { setErrorMessage: (message: string |
 
         const result = await response.json()
         setSummarizeResult(result)
+        
+        // Clear form after successful submission
         summarizeFormik.resetForm()
         setFileMetadata({})
+        setFile(null)
+        setTocHint("")
         clearFileInput("summarize-file-input")
       } catch (error: any) {
         setErrorMessage(
@@ -109,20 +139,29 @@ const SummarizeRFP = ({ setErrorMessage }: { setErrorMessage: (message: string |
     },
   })
 
+  // Sync form values with parent state
+  useEffect(() => {
+    setFile(summarizeFormik.values.file)
+  }, [summarizeFormik.values.file])
+
+  useEffect(() => {
+    setTocHint(summarizeFormik.values.toc_hint)
+  }, [summarizeFormik.values.toc_hint])
+
   const handleSummarizeFileChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0] || null
     if (file) {
       const fullPath = file.webkitRelativePath || file.name
-      setFileMetadata((prev) => ({
-        ...prev,
+      setFileMetadata({
+        ...fileMetadata,
         [file.name]: {
           path: fullPath,
           size: `${(file.size / 1024).toFixed(1)} KB`,
           lastModified: new Date(file.lastModified).toLocaleString(),
         },
-      }))
+      })
     }
     summarizeFormik.setFieldValue("file", file)
   }
@@ -185,9 +224,6 @@ const SummarizeRFP = ({ setErrorMessage }: { setErrorMessage: (message: string |
                         <span className="text-white">
                         Modified: {fileMetadata[summarizeFormik.values.file.name]?.lastModified || "Unknown"}
                         </span>
-                        {/* <div>
-                        Path: {fileMetadata[summarizeFormik.values.file.name]?.path || "Not available"}
-                        </div> */}
                     </div>
                 </div>
             </div>
@@ -214,28 +250,6 @@ const SummarizeRFP = ({ setErrorMessage }: { setErrorMessage: (message: string |
           </div>
         </div>
 
-        {/* <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Temperature
-          </label>
-          <input
-            type="text"
-            name="temperature"
-            value={summarizeFormik.values.temperature}
-            onChange={summarizeFormik.handleChange}
-            onBlur={summarizeFormik.handleBlur}
-            className="block w-full text-sm text-gray-700 border border-gray-300 rounded py-2 px-3"
-            placeholder="Enter temperature (e.g., 0.3)"
-          />
-          {summarizeFormik.touched.temperature &&
-            summarizeFormik.errors.temperature && (
-              <div className="text-red-500 text-sm mt-1">
-                {summarizeFormik.errors.temperature}
-              </div>
-            )}
-        </div> */}
-
-       
         <div className="flex m-6">
             <button
             type="submit"
